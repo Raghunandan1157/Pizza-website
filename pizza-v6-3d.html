@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stone & Wood — 3D Pizza Oven</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { overflow: hidden; background: #0a0806; font-family: 'DM Sans', sans-serif; }
+  ::-webkit-scrollbar { width: 0; }
+
+  /* Loading screen */
+  #loading {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #0a0806;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  #loading h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900; line-height: 0.92;
+    letter-spacing: -0.03em; margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #F5EDE3, #FF9F43, #E85D26);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+  .loading-bar-track {
+    width: 200px; height: 2px;
+    background: rgba(139,125,107,0.2);
+    border-radius: 2px; overflow: hidden;
+  }
+  .loading-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #E85D26, #FF9F43);
+    border-radius: 2px; transition: width 0.3s ease;
+  }
+  .loading-text {
+    margin-top: 1rem; font-size: 0.65rem;
+    letter-spacing: 0.3em; text-transform: uppercase; color: #8B7D6B;
+  }
+
+  /* Back button */
+  .btn-back {
+    position: fixed; top: 1.2rem; left: 1.2rem; z-index: 200;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: #8B7D6B; text-decoration: none;
+    background: rgba(10,8,6,0.7);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(232,93,38,0.15); border-radius: 100px;
+    transition: all 0.3s ease; cursor: pointer;
+  }
+  .btn-back:hover {
+    color: #E85D26; border-color: rgba(232,93,38,0.4);
+    box-shadow: 0 0 12px rgba(232,93,38,0.15);
+  }
+
+  /* Auto-play button */
+  .btn-autoplay {
+    position: fixed; top: 1.2rem; right: 6rem; z-index: 200;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 18px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #8B7D6B;
+    background: rgba(10,8,6,0.7);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(232,93,38,0.15); border-radius: 100px;
+    transition: all 0.3s ease; cursor: pointer;
+  }
+  .btn-autoplay:hover { color: #E85D26; border-color: rgba(232,93,38,0.4); box-shadow: 0 0 12px rgba(232,93,38,0.15); }
+  .btn-autoplay.playing { color: #FF9F43; border-color: rgba(255,159,67,0.4); box-shadow: 0 0 16px rgba(232,93,38,0.2); }
+  .btn-autoplay .play-icon {
+    width: 0; height: 0; border-style: solid;
+    border-width: 5px 0 5px 9px;
+    border-color: transparent transparent transparent currentColor;
+    transition: all 0.2s ease;
+  }
+  .btn-autoplay.playing .play-icon {
+    width: 8px; height: 10px; border-width: 0;
+    border-left: 2.5px solid currentColor;
+    border-right: 2.5px solid currentColor;
+  }
+
+  /* Progress bar */
+  #progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px; z-index: 100; width: 0%;
+    background: linear-gradient(90deg, #E85D26, #FF9F43);
+    box-shadow: 0 0 15px #E85D26, 0 0 30px rgba(232,93,38,0.3);
+  }
+
+  #canvas-container { position: fixed; inset: 0; z-index: 1; }
+
+  #text-overlay {
+    position: fixed; inset: 0; z-index: 10; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .hero-content {
+    text-align: center; max-width: 800px; padding: 0 2rem;
+    opacity: 0; transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .hero-content.visible { opacity: 1; transform: translateY(0); }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900; line-height: 0.92;
+    letter-spacing: -0.03em; margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #F5EDE3, #FF9F43, #E85D26);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    font-weight: 300; font-style: italic;
+    color: #8B7D6B; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .hero-scroll {
+    margin-top: 2.5rem; font-size: 0.7rem;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: #8B7D6B; animation: breathe 3s ease-in-out infinite;
+  }
+  .hero-scroll-line {
+    width: 1px; height: 45px; margin: 1rem auto 0;
+    background: linear-gradient(to bottom, #8B7D6B, transparent);
+  }
+
+  .finale-content {
+    text-align: center; max-width: 600px; padding: 0 2rem;
+    opacity: 0; transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .finale-content.visible { opacity: 1; transform: translateY(0); }
+  .finale-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 900; line-height: 1; margin-bottom: 1rem;
+    background: linear-gradient(135deg, #FF9F43, #E85D26, #F5EDE3);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .finale-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; color: #C4B8A8; font-style: italic;
+  }
+
+  .stage-card {
+    position: absolute; max-width: 400px; padding: 2.2rem;
+    background: rgba(10,8,6,0.88);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(232,93,38,0.12); border-radius: 3px;
+    opacity: 0; transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .stage-card.visible { opacity: 1; transform: translateY(0); }
+  .stage-card.left { left: clamp(2rem, 5vw, 5rem); }
+  .stage-card.right { right: clamp(2rem, 5vw, 5rem); }
+
+  .stage-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem; font-weight: 900;
+    color: #E85D26; opacity: 0; line-height: 1; margin-bottom: -4px;
+    transform: translateY(12px);
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+  .stage-card.visible .stage-num { opacity: 0.2; transform: translateY(0); }
+
+  .stage-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+    font-weight: 700; margin-bottom: 0.6rem; color: #F5EDE3;
+    opacity: 0; transform: translateY(12px);
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1) 0.08s;
+  }
+  .stage-card.visible .stage-title { opacity: 1; transform: translateY(0); }
+
+  .stage-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; line-height: 1.75;
+    color: #C4B8A8; font-weight: 300;
+    opacity: 0; transform: translateY(12px);
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1) 0.16s;
+  }
+  .stage-card.visible .stage-desc { opacity: 1; transform: translateY(0); }
+
+  .stage-detail {
+    margin-top: 0.9rem; padding-top: 0.9rem;
+    border-top: 1px solid rgba(232,93,38,0.15);
+    font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #FF9F43;
+    opacity: 0; transform: translateY(12px);
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1) 0.24s;
+  }
+  .stage-card.visible .stage-detail { opacity: 1; transform: translateY(0); }
+
+  .stage-temp {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.35rem 0.9rem; margin-top: 0.9rem;
+    background: rgba(232,93,38,0.12);
+    border: 1px solid rgba(232,93,38,0.25);
+    border-radius: 100px; font-size: 0.8rem; color: #FF9F43;
+    opacity: 0; transform: translateY(12px);
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1) 0.24s;
+  }
+  .stage-card.visible .stage-temp { opacity: 1; transform: translateY(0); }
+  .temp-dot {
+    width: 6px; height: 6px; background: #E85D26; border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  #nav-dots {
+    position: fixed; right: 1.8rem; top: 50%; transform: translateY(-50%);
+    z-index: 50; display: flex; flex-direction: column; gap: 1.1rem; align-items: flex-end;
+  }
+  .nav-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #8B7D6B; opacity: 0.3; cursor: pointer;
+    position: relative; transition: all 0.4s ease; border: none; padding: 0;
+  }
+  .nav-dot.active {
+    width: 11px; height: 11px; background: #E85D26; opacity: 1;
+    box-shadow: 0 0 12px #E85D26;
+  }
+  .nav-dot-label {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #8B7D6B; white-space: nowrap; opacity: 0;
+    transition: opacity 0.3s; pointer-events: none; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-dot.active .nav-dot-label { opacity: 1; }
+
+  #scroll-container {
+    position: fixed; inset: 0; z-index: 20;
+    overflow-y: auto; overflow-x: hidden;
+  }
+  #scroll-spacer { height: 900vh; pointer-events: none; }
+
+  #grain {
+    position: fixed; inset: -50%; width: 200%; height: 200%;
+    z-index: 90; pointer-events: none; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Vignette overlay */
+  #vignette {
+    position: fixed; inset: 0; z-index: 89; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(5,3,1,0.65) 100%);
+  }
+
+  @keyframes breathe { 0%,100%{opacity:0.4} 50%{opacity:1} }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+
+  @media (max-width: 768px) {
+    #nav-dots {
+      right: auto; top: auto; bottom: 1.5rem;
+      left: 50%; transform: translateX(-50%);
+      flex-direction: row; gap: 0.8rem; align-items: center;
+    }
+    .nav-dot-label { display: none; }
+    .stage-card { max-width: calc(100vw - 3rem); padding: 1.5rem; }
+    .stage-card.left, .stage-card.right { left: 1.5rem; right: 1.5rem; }
+    .stage-num { font-size: 2.8rem; }
+    .stage-title { font-size: 1.3rem; }
+    .stage-desc { font-size: 0.95rem; }
+    #scroll-spacer { height: 600vh; }
+    .hero-title { font-size: clamp(2.5rem, 7vw, 4.5rem); }
+    .finale-title { font-size: clamp(2rem, 5vw, 3.5rem); }
+    .btn-back { top: 0.8rem; left: 0.8rem; padding: 6px 12px; font-size: 0.65rem; }
+    .btn-autoplay { top: 0.8rem; right: 0.8rem; padding: 6px 12px; font-size: 0.65rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <h1>Stone<br>& Wood</h1>
+  <div class="loading-bar-track"><div class="loading-bar-fill" id="loading-fill"></div></div>
+  <div class="loading-text">Lighting the oven...</div>
+</div>
+
+<a href="index.html" class="btn-back">&larr; Back</a>
+<button class="btn-autoplay" id="btn-autoplay">
+  <span class="play-icon"></span>
+  <span class="autoplay-label">Auto Play</span>
+</button>
+
+<div id="progress-bar"></div>
+<div id="canvas-container"></div>
+<div id="vignette"></div>
+
+<div id="text-overlay">
+  <div class="hero-content" id="hero">
+    <h1 class="hero-title">Stone<br>& Wood</h1>
+    <div class="hero-sub">The Ancient Art of Fire & Dough</div>
+    <div class="hero-scroll">Scroll or press Auto Play<div class="hero-scroll-line"></div></div>
+  </div>
+  <div class="finale-content" id="finale" style="display:none;">
+    <h2 class="finale-title">Perfetto.</h2>
+    <p class="finale-desc">From flour and flame, a masterpiece emerges &mdash; crisp, charred, alive.</p>
+  </div>
+  <div class="stage-card left" id="stage1" style="display:none;">
+    <div class="stage-num">01</div>
+    <div class="stage-title">The Dough Awakens</div>
+    <div class="stage-desc">Cold-fermented for 72 hours, stretched by hand &mdash; never rolled &mdash; preserving delicate air pockets that become the signature leopard-spotted char.</div>
+    <div class="stage-detail">72-hour fermentation &middot; Type 00 flour</div>
+  </div>
+  <div class="stage-card right" id="stage2" style="display:none;">
+    <div class="stage-num">02</div>
+    <div class="stage-title">Dressed in Fire Colors</div>
+    <div class="stage-desc">San Marzano tomatoes, crushed by hand. Fresh mozzarella di bufala, torn &mdash; not sliced. Basil leaves placed like emeralds on a crown.</div>
+    <div class="stage-detail">San Marzano DOP &middot; Buffalo Mozzarella</div>
+  </div>
+  <div class="stage-card left" id="stage3" style="display:none;">
+    <div class="stage-num">03</div>
+    <div class="stage-title">Into the Inferno</div>
+    <div class="stage-desc">The pizza slides into the stone oven on a flour-dusted peel. 450&deg;C of ancient, primal energy wrapping around the dough.</div>
+    <div class="stage-temp"><span class="temp-dot"></span>450&deg;C &mdash; Stone Floor</div>
+  </div>
+  <div class="stage-card right" id="stage4" style="display:none;">
+    <div class="stage-num">04</div>
+    <div class="stage-title">The Sacred Turn</div>
+    <div class="stage-desc">Every 20 seconds, the pizzaiolo rotates with a practiced flick &mdash; reading the flame, ensuring each edge kisses the fire equally.</div>
+    <div class="stage-detail">90 seconds &middot; Rotated 4&ndash;5 times</div>
+  </div>
+  <div class="stage-card left" id="stage5" style="display:none;">
+    <div class="stage-num">05</div>
+    <div class="stage-title">Born from Flame</div>
+    <div class="stage-desc">The crust rises like a crown &mdash; blistered, spotted, impossibly light. Cheese pools into molten rivers. Basil wilts into fragrant whispers.</div>
+    <div class="stage-temp"><span class="temp-dot"></span>90 seconds to perfection</div>
+  </div>
+</div>
+
+<nav id="nav-dots">
+  <button class="nav-dot active" data-stage="0"><span class="nav-dot-label">The Oven</span></button>
+  <button class="nav-dot" data-stage="1"><span class="nav-dot-label">The Dough</span></button>
+  <button class="nav-dot" data-stage="2"><span class="nav-dot-label">Toppings</span></button>
+  <button class="nav-dot" data-stage="3"><span class="nav-dot-label">Into Fire</span></button>
+  <button class="nav-dot" data-stage="4"><span class="nav-dot-label">The Turn</span></button>
+  <button class="nav-dot" data-stage="5"><span class="nav-dot-label">Perfection</span></button>
+  <button class="nav-dot" data-stage="6"><span class="nav-dot-label">Serve</span></button>
+</nav>
+
+<div id="scroll-container"><div id="scroll-spacer"></div></div>
+<div id="grain"></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.162.0/build/three.module.js" } }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'https://unpkg.com/three@0.162.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'https://unpkg.com/three@0.162.0/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'https://unpkg.com/three@0.162.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+// ============================================
+// CONFIG & HELPERS
+// ============================================
+const STAGES = [
+  { label: 'The Oven',   start: 0,    end: 0.14 },
+  { label: 'The Dough',  start: 0.14, end: 0.28 },
+  { label: 'Toppings',   start: 0.28, end: 0.42 },
+  { label: 'Into Fire',  start: 0.42, end: 0.58 },
+  { label: 'The Turn',   start: 0.58, end: 0.73 },
+  { label: 'Perfection', start: 0.73, end: 0.87 },
+  { label: 'Serve',      start: 0.87, end: 1.0  },
+];
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function smoothstep(lo, hi, x) { const t = clamp((x - lo) / (hi - lo), 0, 1); return t * t * (3 - 2 * t); }
+function easeInOut(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+const isMobile = window.innerWidth < 768;
+
+// ============================================
+// STATE
+// ============================================
+let scrollProgress = 0;
+let smoothProgress = 0;
+let currentStage = 0;
+let time = 0;
+let firstRenderDone = false;
+let autoPlaying = false;
+let autoPlayProgress = 0;
+const AUTO_PLAY_DURATION = 35;
+
+const container = document.getElementById('canvas-container');
+const scrollContainer = document.getElementById('scroll-container');
+const progressBar = document.getElementById('progress-bar');
+const loadingEl = document.getElementById('loading');
+const loadingFill = document.getElementById('loading-fill');
+const heroEl = document.getElementById('hero');
+const finaleEl = document.getElementById('finale');
+const stageEls = [null, document.getElementById('stage1'), document.getElementById('stage2'), document.getElementById('stage3'), document.getElementById('stage4'), document.getElementById('stage5')];
+const navDots = document.querySelectorAll('.nav-dot');
+
+// ============================================
+// BUILD SCENE - CINEMATIC OVERHAUL
+// ============================================
+function buildScene() {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d0a07);
+  scene.fog = new THREE.FogExp2(0x0d0a07, 0.016);
+
+  // ---- DRAMATIC LIGHTING ----
+  const ambient = new THREE.AmbientLight(0x2a1a0e, 0.6);
+  scene.add(ambient);
+
+  // Main fire glow - BIG and warm
+  const fireLight1 = new THREE.PointLight(0xff5511, 8, 15, 1.5);
+  fireLight1.position.set(0, 2.0, -0.8);
+  fireLight1.castShadow = true;
+  fireLight1.shadow.mapSize.set(1024, 1024);
+  scene.add(fireLight1);
+
+  const fireLight2 = new THREE.PointLight(0xff8833, 5, 10, 1.5);
+  fireLight2.position.set(0.4, 2.4, -0.4);
+  scene.add(fireLight2);
+
+  const fireLight3 = new THREE.PointLight(0xff3300, 3, 8, 1.5);
+  fireLight3.position.set(-0.4, 1.8, -1.2);
+  scene.add(fireLight3);
+
+  // Warm fill from oven mouth
+  const mouthGlow = new THREE.PointLight(0xff6622, 4, 8, 1.5);
+  mouthGlow.position.set(0, 1.5, 1.0);
+  scene.add(mouthGlow);
+
+  // Warm orange ground bounce
+  const groundBounce = new THREE.PointLight(0xff4400, 1.5, 12, 2);
+  groundBounce.position.set(0, 0.3, 1.5);
+  scene.add(groundBounce);
+
+  const keyLight = new THREE.DirectionalLight(0xffeedd, 0.5);
+  keyLight.position.set(3, 6, 5);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(1024, 1024);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0x442200, 0.3);
+  fillLight.position.set(-4, 3, 4);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.DirectionalLight(0xff6633, 0.4);
+  rimLight.position.set(-2, 4, -5);
+  scene.add(rimLight);
+
+  // Serve spotlight
+  const serveSpot = new THREE.SpotLight(0xff9933, 0, 12, Math.PI * 0.25, 0.5, 1.5);
+  serveSpot.position.set(0, 5, 4);
+  serveSpot.target.position.set(0, 1.2, 2.5);
+  scene.add(serveSpot);
+  scene.add(serveSpot.target);
+
+  // ---- FLOOR ----
+  const floorGeo = new THREE.PlaneGeometry(40, 40);
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: 0x1a1410, roughness: 0.9, metalness: 0.05
+  });
+  const floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // ---- BACK WALL ----
+  const wallGeo = new THREE.PlaneGeometry(8, 5);
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x6B1515, roughness: 0.8, metalness: 0.05 });
+  const wall = new THREE.Mesh(wallGeo, wallMat);
+  wall.position.set(0, 2.8, -3.5);
+  wall.receiveShadow = true;
+  scene.add(wall);
+
+  // Wall tiles - varied warm reds
+  const tileGroup = new THREE.Group();
+  const tRows = isMobile ? 16 : 24;
+  const tCols = isMobile ? 24 : 38;
+  for (let row = 0; row < tRows; row++) {
+    for (let col = 0; col < tCols; col++) {
+      const isAccent = Math.random() < 0.12;
+      const tGeo = new THREE.BoxGeometry(0.18, 0.18, 0.02);
+      const hue = 0.01 + Math.random() * 0.02;
+      const sat = 0.55 + Math.random() * 0.3;
+      const lit = isAccent ? (0.04 + Math.random() * 0.04) : (0.22 + Math.random() * 0.15);
+      const tMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color().setHSL(hue, sat, lit),
+        roughness: 0.7 + Math.random() * 0.2, metalness: 0.05
+      });
+      const tile = new THREE.Mesh(tGeo, tMat);
+      tile.position.set(-3.4 + col * 0.19, 0.7 + row * 0.19, -3.45);
+      tileGroup.add(tile);
+    }
+  }
+  scene.add(tileGroup);
+
+  // ---- COUNTER (MeshPhysicalMaterial for polished granite) ----
+  const counterGroup = new THREE.Group();
+
+  const graniteTop = new THREE.Mesh(
+    new THREE.BoxGeometry(5.0, 0.1, 3.0),
+    new THREE.MeshPhysicalMaterial({
+      color: 0x0e0e0e, roughness: 0.08, metalness: 0.4,
+      clearcoat: 0.9, clearcoatRoughness: 0.1,
+      reflectivity: 0.8
+    })
+  );
+  graniteTop.position.y = 1.05;
+  graniteTop.castShadow = true;
+  graniteTop.receiveShadow = true;
+  counterGroup.add(graniteTop);
+
+  // Brick base
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x5C2020, roughness: 0.85, metalness: 0.05 });
+  const baseBody = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.0, 2.8), baseMat);
+  baseBody.position.y = 0.5;
+  baseBody.castShadow = true;
+  counterGroup.add(baseBody);
+
+  // Base trim
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0x1a1410, roughness: 0.6, metalness: 0.3 });
+  const baseTrim = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.06, 3.0), trimMat);
+  baseTrim.position.y = 0.02;
+  counterGroup.add(baseTrim);
+
+  scene.add(counterGroup);
+
+  // ---- OVEN (MeshPhysicalMaterial dome with clearcoat sheen) ----
+  const ovenGroup = new THREE.Group();
+  ovenGroup.position.set(0, 1.1, -0.5);
+
+  const openAngle = Math.PI * 0.36;
+  const phiStart = Math.PI / 2 + openAngle / 2;
+  const phiLength = Math.PI * 2 - openAngle;
+
+  const domeGeo = new THREE.SphereGeometry(1.4, 64, 32, phiStart, phiLength, 0, Math.PI * 0.5);
+  const domeMat = new THREE.MeshPhysicalMaterial({
+    color: 0x7A1818, roughness: 0.6, metalness: 0.1,
+    clearcoat: 0.35, clearcoatRoughness: 0.4
+  });
+  const dome = new THREE.Mesh(domeGeo, domeMat);
+  dome.castShadow = true;
+  ovenGroup.add(dome);
+
+  // Side walls
+  const wallMaterial = new THREE.MeshStandardMaterial({
+    color: 0x1a0e05, roughness: 1.0, metalness: 0.0, side: THREE.DoubleSide
+  });
+  const sideWallSegs = 20;
+  const sideR = 1.4;
+  for (let side = 0; side < 2; side++) {
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    for (let i = 0; i <= sideWallSegs; i++) {
+      const theta = (i / sideWallSegs) * Math.PI * 0.5;
+      shape.lineTo(Math.sin(theta) * sideR, Math.cos(theta) * sideR);
+    }
+    shape.lineTo(0, 0);
+    const geo = new THREE.ShapeGeometry(shape);
+    const mesh = new THREE.Mesh(geo, wallMaterial);
+    const angle = Math.PI / 2 + (side === 0 ? -openAngle / 2 : openAngle / 2);
+    mesh.rotation.y = angle;
+    if (side === 1) mesh.scale.x = -1;
+    ovenGroup.add(mesh);
+  }
+
+  // Dome brick bumps
+  const brickCount = isMobile ? 80 : 160;
+  for (let i = 0; i < brickCount; i++) {
+    const phi = Math.random() * Math.PI * 0.48;
+    const theta = Math.random() * Math.PI * 2;
+    let tNorm = theta;
+    if (tNorm > Math.PI) tNorm -= Math.PI * 2;
+    if (Math.abs(tNorm - Math.PI / 2) < openAngle / 2 + 0.05) continue;
+    const r = 1.42;
+    const w = 0.1 + Math.random() * 0.08;
+    const h = 0.1 + Math.random() * 0.08;
+    const bGeo = new THREE.BoxGeometry(w, h, 0.025);
+    const isDark = Math.random() < 0.15;
+    const bCol = isDark
+      ? new THREE.Color().setHSL(0, 0, 0.04 + Math.random() * 0.04)
+      : new THREE.Color().setHSL(0.01 + Math.random() * 0.02, 0.5 + Math.random() * 0.3, 0.2 + Math.random() * 0.15);
+    const bMat = new THREE.MeshStandardMaterial({ color: bCol, roughness: 0.8 + Math.random() * 0.15 });
+    const brick = new THREE.Mesh(bGeo, bMat);
+    brick.position.set(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.cos(phi),
+      r * Math.sin(phi) * Math.sin(theta)
+    );
+    brick.lookAt(0, 0, 0);
+    ovenGroup.add(brick);
+  }
+
+  // ---- ARCH FRAME ----
+  const archGroup = new THREE.Group();
+  archGroup.position.set(0, 0, 1.15);
+
+  const archShape = new THREE.Shape();
+  const aOuter = 0.95, aInner = 0.72;
+  const aSegs = 48;
+  for (let i = 0; i <= aSegs; i++) {
+    const a = Math.PI - (Math.PI * i / aSegs);
+    archShape.lineTo(Math.cos(a) * aOuter, Math.sin(a) * aOuter);
+  }
+  for (let i = aSegs; i >= 0; i--) {
+    const a = Math.PI - (Math.PI * i / aSegs);
+    archShape.lineTo(Math.cos(a) * aInner, Math.sin(a) * aInner);
+  }
+  archShape.closePath();
+
+  const archGeo = new THREE.ExtrudeGeometry(archShape, {
+    depth: 0.2, bevelEnabled: true, bevelThickness: 0.015, bevelSize: 0.015, bevelSegments: 3
+  });
+  const archMat = new THREE.MeshPhysicalMaterial({
+    color: 0x1c1a18, roughness: 0.3, metalness: 0.8,
+    clearcoat: 0.2, clearcoatRoughness: 0.3
+  });
+  const archMesh = new THREE.Mesh(archGeo, archMat);
+  archMesh.position.z = -0.1;
+  archMesh.castShadow = true;
+  archGroup.add(archMesh);
+
+  // Inner copper accent ring
+  const iArchShape = new THREE.Shape();
+  const iO = 0.75, iI = 0.68;
+  for (let i = 0; i <= aSegs; i++) {
+    const a = Math.PI - (Math.PI * i / aSegs);
+    iArchShape.lineTo(Math.cos(a) * iO, Math.sin(a) * iO);
+  }
+  for (let i = aSegs; i >= 0; i--) {
+    const a = Math.PI - (Math.PI * i / aSegs);
+    iArchShape.lineTo(Math.cos(a) * iI, Math.sin(a) * iI);
+  }
+  iArchShape.closePath();
+  const iArchGeo = new THREE.ExtrudeGeometry(iArchShape, { depth: 0.1, bevelEnabled: false });
+  const iArchMat = new THREE.MeshPhysicalMaterial({
+    color: 0x8B6914, roughness: 0.35, metalness: 0.7,
+    clearcoat: 0.3, clearcoatRoughness: 0.2
+  });
+  const iArchMesh = new THREE.Mesh(iArchGeo, iArchMat);
+  iArchMesh.position.z = 0.02;
+  archGroup.add(iArchMesh);
+
+  // "STONE" metal letters
+  [{ c:'S', a:2.4 }, { c:'T', a:2.1 }, { c:'O', a:1.8 }, { c:'N', a:1.5 }, { c:'E', a:1.2 }].forEach(ld => {
+    const g = new THREE.BoxGeometry(0.1, 0.15, 0.04);
+    const m = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.25, metalness: 0.9 });
+    const mesh = new THREE.Mesh(g, m);
+    mesh.position.set(Math.cos(ld.a) * 0.84, Math.sin(ld.a) * 0.84, 0.12);
+    mesh.rotation.z = ld.a - Math.PI / 2;
+    archGroup.add(mesh);
+  });
+
+  // "WOOD" letters
+  [{ c:'W', a:0.7 }, { c:'O', a:0.5 }, { c:'O', a:0.35 }, { c:'D', a:0.2 }].forEach(ld => {
+    const g = new THREE.BoxGeometry(0.08, 0.12, 0.035);
+    const m = new THREE.MeshStandardMaterial({ color: 0xbbbbbb, roughness: 0.25, metalness: 0.9 });
+    const mesh = new THREE.Mesh(g, m);
+    mesh.position.set(Math.cos(ld.a) * 0.84, Math.sin(ld.a) * 0.84, 0.12);
+    mesh.rotation.z = ld.a - Math.PI / 2;
+    archGroup.add(mesh);
+  });
+
+  ovenGroup.add(archGroup);
+
+  // ---- OVEN FLOOR (stone hearth) ----
+  const hearthGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.05, 48);
+  const hearthMat = new THREE.MeshStandardMaterial({ color: 0x8B7355, roughness: 0.9, metalness: 0.02 });
+  const hearth = new THREE.Mesh(hearthGeo, hearthMat);
+  hearth.position.set(0, 0.025, 0);
+  hearth.receiveShadow = true;
+  ovenGroup.add(hearth);
+
+  // Interior dome (dark sooty)
+  const interiorGeo = new THREE.SphereGeometry(1.15, 32, 16, phiStart, phiLength, 0, Math.PI * 0.5);
+  const interiorMat = new THREE.MeshStandardMaterial({
+    color: 0x0a0604, roughness: 1.0, metalness: 0.0, side: THREE.BackSide
+  });
+  const interior = new THREE.Mesh(interiorGeo, interiorMat);
+  ovenGroup.add(interior);
+
+  // ---- VOLUMETRIC OVEN MOUTH GLOW (additive-blended plane) ----
+  const mouthGlowPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.6, 1.2),
+    new THREE.MeshBasicMaterial({
+      color: 0xff6622,
+      transparent: true,
+      opacity: 0.18,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    })
+  );
+  mouthGlowPlane.position.set(0, 0.45, 1.25);
+  ovenGroup.add(mouthGlowPlane);
+
+  // Second glow layer - more orange, larger
+  const mouthGlowPlane2 = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.2, 1.6),
+    new THREE.MeshBasicMaterial({
+      color: 0xff4411,
+      transparent: true,
+      opacity: 0.08,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    })
+  );
+  mouthGlowPlane2.position.set(0, 0.5, 1.35);
+  ovenGroup.add(mouthGlowPlane2);
+
+  // ---- BILLBOARD FIRE (additive-blended planes for volumetric look) ----
+  const fireGroup = new THREE.Group();
+  fireGroup.position.set(0, 0.08, -0.5);
+
+  const flameData = [];
+
+  // Create billboard flame planes with additive blending
+  function createFlamePlane(width, height, color, opacity) {
+    const geo = new THREE.PlaneGeometry(width, height);
+    const mat = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: opacity,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    return new THREE.Mesh(geo, mat);
+  }
+
+  // Large background fire planes (warm orange)
+  for (let i = 0; i < 20; i++) {
+    const w = 0.15 + Math.random() * 0.3;
+    const h = 0.3 + Math.random() * 0.7;
+    const hue = 0.04 + Math.random() * 0.06;
+    const sat = 0.9 + Math.random() * 0.1;
+    const lit = 0.5 + Math.random() * 0.3;
+    const flame = createFlamePlane(w, h, new THREE.Color().setHSL(hue, sat, lit), 0.25 + Math.random() * 0.25);
+    flame.position.set(
+      (Math.random() - 0.5) * 1.0,
+      0.2 + Math.random() * 0.25,
+      (Math.random() - 0.5) * 0.5
+    );
+    flame.rotation.y = Math.random() * Math.PI;
+    flameData.push({
+      mesh: flame,
+      speed: 3 + Math.random() * 6,
+      phase: Math.random() * Math.PI * 2,
+      baseY: flame.position.y,
+      baseScale: 0.6 + Math.random() * 0.8,
+      baseX: flame.position.x,
+      baseOpacity: flame.material.opacity,
+    });
+    fireGroup.add(flame);
+  }
+
+  // Mid-layer fire planes (bright yellow-orange)
+  for (let i = 0; i < 15; i++) {
+    const w = 0.1 + Math.random() * 0.2;
+    const h = 0.2 + Math.random() * 0.5;
+    const flame = createFlamePlane(w, h, new THREE.Color().setHSL(0.08 + Math.random() * 0.04, 1, 0.6 + Math.random() * 0.2), 0.3 + Math.random() * 0.3);
+    flame.position.set(
+      (Math.random() - 0.5) * 0.7,
+      0.15 + Math.random() * 0.2,
+      (Math.random() - 0.5) * 0.35
+    );
+    flame.rotation.y = Math.random() * Math.PI;
+    flameData.push({
+      mesh: flame,
+      speed: 4 + Math.random() * 8,
+      phase: Math.random() * Math.PI * 2,
+      baseY: flame.position.y,
+      baseScale: 0.5 + Math.random() * 0.7,
+      baseX: flame.position.x,
+      baseOpacity: flame.material.opacity,
+    });
+    fireGroup.add(flame);
+  }
+
+  // White-hot core planes (center, very bright)
+  for (let i = 0; i < 10; i++) {
+    const w = 0.05 + Math.random() * 0.1;
+    const h = 0.1 + Math.random() * 0.3;
+    const flame = createFlamePlane(w, h, new THREE.Color().setHSL(0.12, 0.4, 0.85 + Math.random() * 0.15), 0.35 + Math.random() * 0.35);
+    flame.position.set(
+      (Math.random() - 0.5) * 0.4,
+      0.1 + Math.random() * 0.15,
+      (Math.random() - 0.5) * 0.2
+    );
+    flame.rotation.y = Math.random() * Math.PI;
+    flameData.push({
+      mesh: flame,
+      speed: 5 + Math.random() * 10,
+      phase: Math.random() * Math.PI * 2,
+      baseY: flame.position.y,
+      baseScale: 0.4 + Math.random() * 0.6,
+      baseX: flame.position.x,
+      baseOpacity: flame.material.opacity,
+    });
+    fireGroup.add(flame);
+  }
+
+  // Glowing embers
+  const emberGeo = new THREE.SphereGeometry(0.018, 6, 6);
+  const emberData = [];
+  for (let i = 0; i < 35; i++) {
+    const eMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(0.05 + Math.random() * 0.05, 1, 0.5 + Math.random() * 0.4),
+      transparent: true, opacity: 0.9,
+    });
+    const ember = new THREE.Mesh(emberGeo, eMat);
+    ember.position.set(
+      (Math.random() - 0.5) * 1.0,
+      Math.random() * 0.4,
+      (Math.random() - 0.5) * 0.4
+    );
+    emberData.push({
+      mesh: ember,
+      vy: 0.5 + Math.random() * 2.0,
+      phase: Math.random() * Math.PI * 2,
+      baseY: ember.position.y,
+      baseX: ember.position.x,
+    });
+    fireGroup.add(ember);
+  }
+
+  // Logs
+  for (let i = 0; i < 4; i++) {
+    const logLen = 0.5 + Math.random() * 0.4;
+    const logGeo = new THREE.CylinderGeometry(0.04, 0.06, logLen, 10);
+    const logMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color().setHSL(0.06, 0.6, 0.08 + Math.random() * 0.06), roughness: 0.95
+    });
+    const log = new THREE.Mesh(logGeo, logMat);
+    log.position.set((Math.random() - 0.5) * 0.5, 0.05, (Math.random() - 0.5) * 0.3);
+    log.rotation.z = Math.PI / 2 + (Math.random() - 0.5) * 0.6;
+    log.rotation.y = Math.random() * 0.5;
+    fireGroup.add(log);
+  }
+
+  // Glowing embers on logs
+  for (let i = 0; i < 12; i++) {
+    const eGeo = new THREE.SphereGeometry(0.01 + Math.random() * 0.008, 4, 4);
+    const eMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(0.05, 1, 0.6 + Math.random() * 0.3),
+      transparent: true, opacity: 0.8
+    });
+    const e = new THREE.Mesh(eGeo, eMat);
+    e.position.set((Math.random() - 0.5) * 0.5, 0.04 + Math.random() * 0.04, (Math.random() - 0.5) * 0.3);
+    fireGroup.add(e);
+  }
+
+  ovenGroup.add(fireGroup);
+
+  // ---- HEAT SHIMMER SHADER (distortion plane at oven mouth) ----
+  const shimmerMat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    uniforms: {
+      uTime: { value: 0 },
+      uIntensity: { value: 0.012 },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float uTime;
+      uniform float uIntensity;
+      varying vec2 vUv;
+      void main() {
+        vec2 uv = vUv;
+        float distort = sin(uv.y * 18.0 + uTime * 3.0) * uIntensity;
+        distort += sin(uv.y * 12.0 - uTime * 2.2) * uIntensity * 0.7;
+        distort += sin(uv.x * 8.0 + uTime * 1.5) * uIntensity * 0.3;
+        float edgeFade = smoothstep(0.0, 0.25, uv.x) * smoothstep(1.0, 0.75, uv.x);
+        float vertFade = smoothstep(0.0, 0.2, uv.y) * smoothstep(1.0, 0.6, uv.y);
+        float alpha = edgeFade * vertFade * 0.06;
+        // Warm tint that distorts perceived space
+        vec3 warmColor = vec3(1.0, 0.7, 0.3);
+        gl_FragColor = vec4(warmColor, alpha + abs(distort) * 2.0);
+      }
+    `,
+  });
+  const shimmerPlane = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.2), shimmerMat);
+  shimmerPlane.position.set(0, 0.5, 1.5);
+  ovenGroup.add(shimmerPlane);
+
+  scene.add(ovenGroup);
+
+  // ---- FLOATING DUST/ASH PARTICLES (atmosphere) ----
+  const dustData = [];
+  const dustGeo = new THREE.SphereGeometry(0.006, 4, 4);
+  const dustCount = isMobile ? 40 : 80;
+  for (let i = 0; i < dustCount; i++) {
+    const isAsh = Math.random() < 0.3;
+    const dMat = new THREE.MeshBasicMaterial({
+      color: isAsh ? 0x887766 : 0xccaa88,
+      transparent: true,
+      opacity: 0.15 + Math.random() * 0.2,
+    });
+    const dust = new THREE.Mesh(dustGeo, dMat);
+    const startX = (Math.random() - 0.5) * 8;
+    const startY = 0.5 + Math.random() * 4;
+    const startZ = (Math.random() - 0.5) * 8;
+    dust.position.set(startX, startY, startZ);
+    dustData.push({
+      mesh: dust,
+      baseX: startX, baseY: startY, baseZ: startZ,
+      speedX: (Math.random() - 0.5) * 0.3,
+      speedY: 0.05 + Math.random() * 0.15,
+      speedZ: (Math.random() - 0.5) * 0.2,
+      phase: Math.random() * Math.PI * 2,
+      driftRadius: 0.3 + Math.random() * 0.8,
+    });
+    scene.add(dust);
+  }
+
+  // ---- PIZZA ----
+  const pizzaGroup = new THREE.Group();
+  pizzaGroup.position.set(0, 1.2, 5);
+
+  const doughGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.035, 48);
+  const doughMat = new THREE.MeshStandardMaterial({ color: 0xE8D5B0, roughness: 0.75, metalness: 0.0 });
+  const dough = new THREE.Mesh(doughGeo, doughMat);
+  pizzaGroup.add(dough);
+
+  const crustGeo = new THREE.TorusGeometry(0.41, 0.04, 14, 48);
+  const crustMat = new THREE.MeshStandardMaterial({ color: 0xC8A060, roughness: 0.7, metalness: 0.0 });
+  const crust = new THREE.Mesh(crustGeo, crustMat);
+  crust.rotation.x = Math.PI / 2;
+  crust.position.y = 0.02;
+  pizzaGroup.add(crust);
+
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2;
+    const bGeo = new THREE.SphereGeometry(0.018 + Math.random() * 0.012, 6, 6);
+    const bMat = new THREE.MeshStandardMaterial({ color: 0xC8A060, roughness: 0.8 });
+    const b = new THREE.Mesh(bGeo, bMat);
+    b.position.set(Math.cos(a) * 0.41, 0.025, Math.sin(a) * 0.41);
+    pizzaGroup.add(b);
+  }
+
+  // Sauce
+  const sauce = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.35, 0.35, 0.012, 48),
+    new THREE.MeshStandardMaterial({ color: 0xCC2211, roughness: 0.55, metalness: 0.0 })
+  );
+  sauce.position.y = 0.024;
+  sauce.visible = false;
+  pizzaGroup.add(sauce);
+
+  // Cheese
+  const cheese = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.33, 0.33, 0.015, 48),
+    new THREE.MeshStandardMaterial({ color: 0xFFF0B0, roughness: 0.35, metalness: 0.05 })
+  );
+  cheese.position.y = 0.033;
+  cheese.visible = false;
+  pizzaGroup.add(cheese);
+
+  const cheeseBlobs = [];
+  for (let i = 0; i < 15; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * 0.28;
+    const blob = new THREE.Mesh(
+      new THREE.SphereGeometry(0.02 + Math.random() * 0.025, 6, 4),
+      new THREE.MeshStandardMaterial({ color: 0xFFF5CC, roughness: 0.35 })
+    );
+    blob.position.set(Math.cos(a) * d, 0.04, Math.sin(a) * d);
+    blob.scale.y = 0.4;
+    blob.visible = false;
+    cheeseBlobs.push(blob);
+    pizzaGroup.add(blob);
+  }
+
+  const toppings = [];
+  const tColors = [0x44AA44, 0xEE3322, 0x222222, 0xD4B480, 0xEE8833, 0x88CC44, 0xDD2200, 0xCCBBAA];
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+    const d = 0.08 + Math.random() * 0.24;
+    const isSlice = Math.random() > 0.5;
+    const geo = isSlice
+      ? new THREE.CylinderGeometry(0.02 + Math.random() * 0.015, 0.02 + Math.random() * 0.015, 0.012, 8)
+      : new THREE.SphereGeometry(0.015 + Math.random() * 0.015, 6, 6);
+    const top = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: tColors[i % tColors.length], roughness: 0.65 }));
+    top.position.set(Math.cos(a) * d, 0.05, Math.sin(a) * d);
+    top.visible = false;
+    toppings.push(top);
+    pizzaGroup.add(top);
+  }
+
+  const basilLeaves = [];
+  for (let i = 0; i < 5; i++) {
+    const leaf = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.04, 0.06),
+      new THREE.MeshStandardMaterial({ color: 0x2D7A2D, roughness: 0.7, side: THREE.DoubleSide })
+    );
+    const a = (i / 5) * Math.PI * 2 + Math.random();
+    const d = 0.1 + Math.random() * 0.2;
+    leaf.position.set(Math.cos(a) * d, 0.055, Math.sin(a) * d);
+    leaf.rotation.x = -Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+    leaf.rotation.z = Math.random() * Math.PI;
+    leaf.visible = false;
+    basilLeaves.push(leaf);
+    pizzaGroup.add(leaf);
+  }
+
+  scene.add(pizzaGroup);
+
+  // ---- PIZZA PEEL ----
+  const peelGroup = new THREE.Group();
+  peelGroup.position.set(0, 1.15, 5);
+  peelGroup.visible = false;
+
+  const peelPad = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.38, 0.42, 0.015, 32),
+    new THREE.MeshPhysicalMaterial({ color: 0xAA8040, roughness: 0.5, metalness: 0.4, clearcoat: 0.15 })
+  );
+  peelGroup.add(peelPad);
+
+  const handle = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.02, 0.025, 1.5, 8),
+    new THREE.MeshStandardMaterial({ color: 0x8B6914, roughness: 0.7, metalness: 0.2 })
+  );
+  handle.rotation.x = Math.PI / 2;
+  handle.position.z = 0.85;
+  peelGroup.add(handle);
+
+  scene.add(peelGroup);
+
+  // ---- SMOKE ----
+  const smokeParticles = [];
+  const smokeGeo = new THREE.SphereGeometry(0.04, 6, 6);
+  for (let i = 0; i < 50; i++) {
+    const sMat = new THREE.MeshBasicMaterial({ color: 0xaa9988, transparent: true, opacity: 0 });
+    const smoke = new THREE.Mesh(smokeGeo, sMat);
+    smoke.position.set((Math.random() - 0.5) * 0.6, 2.0 + Math.random() * 0.4, 0.8 + Math.random() * 0.4);
+    smokeParticles.push({
+      mesh: smoke, vy: 0.3 + Math.random() * 0.8, baseY: smoke.position.y,
+      phase: Math.random() * Math.PI * 2, life: Math.random(),
+    });
+    scene.add(smoke);
+  }
+
+  // ---- SPARKS ----
+  const sparkParticles = [];
+  const sparkGeo = new THREE.SphereGeometry(0.008, 4, 4);
+  for (let i = 0; i < 30; i++) {
+    const sMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(0.06 + Math.random() * 0.04, 1, 0.6 + Math.random() * 0.35),
+      transparent: true, opacity: 0
+    });
+    const spark = new THREE.Mesh(sparkGeo, sMat);
+    spark.position.set(0, 1.5, 0.8);
+    sparkParticles.push({
+      mesh: spark, life: Math.random(),
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: 0.5 + Math.random() * 1.5,
+      vz: 0.3 + Math.random() * 0.8,
+    });
+    scene.add(spark);
+  }
+
+  // ---- STEAM ----
+  const steamParticles = [];
+  const steamGeo = new THREE.SphereGeometry(0.025, 6, 6);
+  for (let i = 0; i < 25; i++) {
+    const stMat = new THREE.MeshBasicMaterial({ color: 0xddccbb, transparent: true, opacity: 0 });
+    const steam = new THREE.Mesh(steamGeo, stMat);
+    const bx = (Math.random() - 0.5) * 0.3;
+    const by = 1.3 + Math.random() * 0.1;
+    steam.position.set(bx, by, 2.5 + (Math.random() - 0.5) * 0.3);
+    steamParticles.push({
+      mesh: steam, life: Math.random(),
+      vy: 0.3 + Math.random() * 0.5,
+      baseX: bx, baseY: by,
+      phase: Math.random() * Math.PI * 2,
+    });
+    scene.add(steam);
+  }
+
+  return {
+    scene, fireLight1, fireLight2, fireLight3, mouthGlow, groundBounce, serveSpot,
+    ovenGroup, pizzaGroup, peelGroup,
+    dough, doughMat, crust, crustMat,
+    sauce, cheese, cheeseBlobs, toppings, basilLeaves,
+    flameData, emberData, smokeParticles, sparkParticles, steamParticles,
+    shimmerMat, mouthGlowPlane, mouthGlowPlane2, dustData,
+  };
+}
+
+// ============================================
+// INIT
+// ============================================
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+container.appendChild(renderer.domElement);
+
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 3.5, 8);
+camera.lookAt(0, 1.5, 0);
+
+// ---- BLOOM POST-PROCESSING ----
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(null, camera); // scene set after build
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.7,   // strength - moderate for cinematic warmth
+  0.4,   // radius
+  0.75   // threshold - only bright things bloom
+);
+composer.addPass(bloomPass);
+
+let loadProgress = 0;
+const loadInterval = setInterval(() => {
+  loadProgress = Math.min(loadProgress + 8 + Math.random() * 12, 90);
+  loadingFill.style.width = loadProgress + '%';
+}, 100);
+
+const sd = buildScene();
+renderPass.scene = sd.scene;
+
+// ============================================
+// SCROLL & AUTOPLAY
+// ============================================
+scrollContainer.addEventListener('scroll', () => {
+  const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+  scrollProgress = clamp(scrollContainer.scrollTop / maxScroll, 0, 1);
+}, { passive: true });
+
+navDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    stopAutoPlay();
+    const i = parseInt(dot.dataset.stage);
+    const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+    const target = (STAGES[i].start + STAGES[i].end) / 2;
+    scrollContainer.scrollTo({ top: target * maxScroll, behavior: 'smooth' });
+  });
+});
+
+const autoPlayBtn = document.getElementById('btn-autoplay');
+const autoPlayLabel = autoPlayBtn.querySelector('.autoplay-label');
+
+function startAutoPlay() {
+  autoPlaying = true;
+  autoPlayProgress = smoothProgress;
+  autoPlayBtn.classList.add('playing');
+  autoPlayLabel.textContent = 'Pause';
+}
+function stopAutoPlay() {
+  autoPlaying = false;
+  autoPlayBtn.classList.remove('playing');
+  autoPlayLabel.textContent = 'Auto Play';
+}
+
+autoPlayBtn.addEventListener('click', () => { autoPlaying ? stopAutoPlay() : startAutoPlay(); });
+scrollContainer.addEventListener('wheel', () => { if (autoPlaying) stopAutoPlay(); }, { passive: true });
+scrollContainer.addEventListener('touchmove', () => { if (autoPlaying) stopAutoPlay(); }, { passive: true });
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && e.target === document.body) {
+    e.preventDefault();
+    autoPlaying ? stopAutoPlay() : startAutoPlay();
+  }
+});
+
+// ============================================
+// TEXT OVERLAY UPDATE
+// ============================================
+function updateTextOverlay() {
+  let stage = 0;
+  STAGES.forEach((s, i) => { if (smoothProgress >= s.start && smoothProgress < s.end) stage = i; });
+  if (smoothProgress >= STAGES[6].start) stage = 6;
+  currentStage = stage;
+
+  const stageLocalP = clamp((smoothProgress - STAGES[stage].start) / (STAGES[stage].end - STAGES[stage].start), 0, 1);
+  const textVisible = stageLocalP > 0.15 && stageLocalP < 0.85;
+
+  progressBar.style.width = (smoothProgress * 100) + '%';
+  navDots.forEach((dot, i) => { dot.classList.toggle('active', i === stage); });
+
+  heroEl.style.display = stage === 0 ? '' : 'none';
+  heroEl.classList.toggle('visible', stage === 0 && textVisible);
+
+  finaleEl.style.display = stage === 6 ? '' : 'none';
+  finaleEl.classList.toggle('visible', stage === 6 && textVisible);
+
+  for (let i = 1; i <= 5; i++) {
+    stageEls[i].style.display = stage === i ? '' : 'none';
+    stageEls[i].classList.toggle('visible', stage === i && textVisible);
+  }
+}
+
+// ============================================
+// ANIMATION LOOP
+// ============================================
+function animate() {
+  requestAnimationFrame(animate);
+  time += 0.016;
+  const t = time;
+
+  if (autoPlaying) {
+    autoPlayProgress += (1 / (AUTO_PLAY_DURATION * 60));
+    if (autoPlayProgress >= 1) { autoPlayProgress = 1; stopAutoPlay(); }
+    scrollProgress = autoPlayProgress;
+    const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+    scrollContainer.scrollTop = autoPlayProgress * maxScroll;
+  }
+
+  const lerpSpeed = autoPlaying ? 0.12 : 0.08;
+  smoothProgress = lerp(smoothProgress, scrollProgress, lerpSpeed);
+  const p = smoothProgress;
+
+  if (!firstRenderDone) {
+    firstRenderDone = true;
+    clearInterval(loadInterval);
+    loadingFill.style.width = '100%';
+    setTimeout(() => loadingEl.classList.add('hidden'), 400);
+  }
+
+  // ---- BILLBOARD FLAMES (face camera, scale/fade) ----
+  sd.flameData.forEach(fd => {
+    const s = Math.sin(t * fd.speed + fd.phase);
+    const c = Math.cos(t * fd.speed * 1.4 + fd.phase);
+    const s2 = Math.sin(t * fd.speed * 0.7 + fd.phase * 1.3);
+    fd.mesh.scale.y = fd.baseScale * (0.5 + s * 0.6 + s2 * 0.2);
+    fd.mesh.scale.x = fd.baseScale * (0.7 + c * 0.3);
+    fd.mesh.position.y = fd.baseY + s * 0.08 + Math.abs(s2) * 0.05;
+    fd.mesh.position.x = fd.baseX + c * 0.04;
+    fd.mesh.material.opacity = clamp(fd.baseOpacity * (0.5 + s * 0.4 + s2 * 0.2), 0.05, fd.baseOpacity * 1.2);
+    // Billboard: face camera
+    fd.mesh.quaternion.copy(camera.quaternion);
+  });
+
+  // ---- EMBERS ----
+  sd.emberData.forEach(ed => {
+    const age = (t * ed.vy + ed.phase) % 3;
+    ed.mesh.position.y = ed.baseY + age * 0.5;
+    ed.mesh.position.x = ed.baseX + Math.sin(t * 2.5 + ed.phase) * 0.12;
+    ed.mesh.material.opacity = age < 2 ? 0.9 * (1 - age / 3) : 0;
+    ed.mesh.scale.setScalar(0.8 + (1 - age / 3) * 0.5);
+  });
+
+  // ---- FIRE LIGHT FLICKER ----
+  const inOven = p > 0.42 && p < 0.87;
+  const fireIntensity = inOven ? 1.8 : 1.0;
+  sd.fireLight1.intensity = (8 + Math.sin(t * 9) * 3 + Math.sin(t * 15) * 1.5 + Math.cos(t * 7) * 1) * fireIntensity;
+  sd.fireLight2.intensity = (5 + Math.cos(t * 7) * 2 + Math.sin(t * 11) * 1) * fireIntensity;
+  sd.fireLight3.intensity = (3 + Math.sin(t * 12 + 1) * 1.5) * fireIntensity;
+
+  sd.mouthGlow.intensity = 4 + Math.sin(t * 3) * 1.5 + Math.sin(t * 7) * 0.8;
+  sd.groundBounce.intensity = 1.5 + Math.sin(t * 4) * 0.5;
+
+  const hShift = Math.sin(t * 2) * 0.01;
+  sd.fireLight1.color.setHSL(0.06 + hShift, 1, 0.55);
+  sd.fireLight2.color.setHSL(0.08 + hShift, 0.9, 0.6);
+
+  // ---- MOUTH GLOW PLANES (pulsing warmth) ----
+  sd.mouthGlowPlane.material.opacity = 0.12 + Math.sin(t * 3.5) * 0.06 + Math.sin(t * 7.2) * 0.03;
+  sd.mouthGlowPlane2.material.opacity = 0.05 + Math.sin(t * 2.8) * 0.03 + Math.sin(t * 5.5) * 0.02;
+
+  // ---- HEAT SHIMMER ----
+  sd.shimmerMat.uniforms.uTime.value = t;
+  sd.shimmerMat.uniforms.uIntensity.value = inOven ? 0.02 : 0.012;
+
+  // ---- FLOATING DUST/ASH ----
+  sd.dustData.forEach(dd => {
+    const drift = Math.sin(t * 0.3 + dd.phase) * dd.driftRadius;
+    dd.mesh.position.x = dd.baseX + drift + Math.sin(t * dd.speedX + dd.phase) * 0.2;
+    dd.mesh.position.y = dd.baseY + ((t * dd.speedY + dd.phase * 3) % 5);
+    dd.mesh.position.z = dd.baseZ + Math.cos(t * dd.speedZ + dd.phase) * 0.3;
+    // Reset if too high
+    if (dd.mesh.position.y > dd.baseY + 5) {
+      dd.mesh.position.y = dd.baseY;
+    }
+    // Fade based on distance from camera
+    const dist = dd.mesh.position.distanceTo(camera.position);
+    dd.mesh.material.opacity = clamp(0.3 - dist * 0.02, 0.02, 0.25);
+  });
+
+  // ---- SMOKE ----
+  sd.smokeParticles.forEach(sp => {
+    const showSmoke = p > 0.3;
+    sp.life += 0.007;
+    if (sp.life > 1) {
+      sp.life = 0;
+      sp.mesh.position.set((Math.random() - 0.5) * 0.6, sp.baseY, 0.8 + Math.random() * 0.4);
+    }
+    sp.mesh.position.y = sp.baseY + sp.life * 2.5;
+    sp.mesh.position.x += Math.sin(t * 0.8 + sp.phase) * 0.003;
+    sp.mesh.scale.setScalar(1 + sp.life * 3);
+    sp.mesh.material.opacity = showSmoke ? Math.sin(sp.life * Math.PI) * 0.08 : 0;
+  });
+
+  // ---- SPARKS ----
+  const showSparks = p > 0.35 && p < 0.92;
+  sd.sparkParticles.forEach(sp => {
+    sp.life += 0.012;
+    if (sp.life > 1) {
+      sp.life = 0;
+      sp.mesh.position.set((Math.random() - 0.5) * 0.3, 1.4 + Math.random() * 0.3, 0.7);
+      sp.vx = (Math.random() - 0.5) * 0.5;
+      sp.vy = 0.5 + Math.random() * 1.5;
+      sp.vz = 0.2 + Math.random() * 0.6;
+    }
+    sp.mesh.position.x += sp.vx * 0.016;
+    sp.mesh.position.y += sp.vy * 0.016;
+    sp.mesh.position.z += sp.vz * 0.008;
+    sp.vy -= 0.02;
+    sp.mesh.material.opacity = showSparks ? clamp((1 - sp.life) * 1.5, 0, 1) : 0;
+    sp.mesh.scale.setScalar(0.5 + (1 - sp.life) * 1.0);
+  });
+
+  // ---- STEAM ----
+  const showSteam = p > 0.87;
+  sd.steamParticles.forEach(sp => {
+    sp.life += 0.005;
+    if (sp.life > 1) {
+      sp.life = 0;
+      sp.mesh.position.set(sp.baseX, sp.baseY, 2.5 + (Math.random() - 0.5) * 0.3);
+    }
+    sp.mesh.position.y = sp.baseY + sp.life * 1.5;
+    sp.mesh.position.x = sp.baseX + Math.sin(t * 1.2 + sp.phase) * 0.1;
+    sp.mesh.scale.setScalar(0.6 + sp.life * 2);
+    sp.mesh.material.opacity = showSteam ? Math.sin(sp.life * Math.PI) * 0.18 : 0;
+  });
+
+  // ---- SERVE SPOTLIGHT ----
+  if (p > 0.87) {
+    sd.serveSpot.intensity = lerp(0, 5, easeInOut((p - 0.87) / 0.13));
+  } else {
+    sd.serveSpot.intensity = 0;
+  }
+
+  // ---- DYNAMIC BLOOM (intensify during fire-heavy stages) ----
+  if (inOven) {
+    bloomPass.strength = lerp(bloomPass.strength, 1.1, 0.03);
+    bloomPass.threshold = lerp(bloomPass.threshold, 0.55, 0.03);
+  } else if (p > 0.87) {
+    bloomPass.strength = lerp(bloomPass.strength, 0.9, 0.03);
+    bloomPass.threshold = lerp(bloomPass.threshold, 0.65, 0.03);
+  } else {
+    bloomPass.strength = lerp(bloomPass.strength, 0.6, 0.03);
+    bloomPass.threshold = lerp(bloomPass.threshold, 0.75, 0.03);
+  }
+
+  // ---- CAMERA WITH CINEMATIC BREATHING ----
+  const cam = camera;
+  // Subtle breathing sway applied to all positions
+  const breathX = Math.sin(t * 0.4) * 0.02 + Math.sin(t * 0.7) * 0.01;
+  const breathY = Math.sin(t * 0.3) * 0.015 + Math.cos(t * 0.55) * 0.008;
+  // Camera shake during fire-intense stages
+  const shakeAmt = inOven ? 0.012 : 0.0;
+  const shakeX = shakeAmt * (Math.sin(t * 17) + Math.sin(t * 23) * 0.5);
+  const shakeY = shakeAmt * (Math.cos(t * 19) + Math.cos(t * 29) * 0.5);
+
+  if (p < 0.14) {
+    const st = easeInOut(p / 0.14);
+    cam.position.set(lerp(0, 1.2, st) + breathX + shakeX, lerp(3.5, 2.8, st) + breathY + shakeY, lerp(8, 5.5, st));
+    cam.lookAt(0, lerp(1.5, 1.3, st), lerp(0, -0.2, st));
+  } else if (p < 0.28) {
+    const st = easeInOut((p - 0.14) / 0.14);
+    cam.position.set(lerp(1.2, 0.8, st) + breathX + shakeX, lerp(2.8, 2.2, st) + breathY + shakeY, lerp(5.5, 4, st));
+    cam.lookAt(0, lerp(1.3, 1.2, st), lerp(-0.2, 1.5, st));
+  } else if (p < 0.42) {
+    const st = easeInOut((p - 0.28) / 0.14);
+    cam.position.set(lerp(0.8, -0.2, st) + breathX + shakeX, lerp(2.2, 2.6, st) + breathY + shakeY, lerp(4, 3.5, st));
+    cam.lookAt(0, 1.2, lerp(1.5, 1, st));
+  } else if (p < 0.58) {
+    const st = easeInOut((p - 0.42) / 0.16);
+    cam.position.set(lerp(-0.2, 1.8, st) + breathX + shakeX, lerp(2.6, 1.8, st) + breathY + shakeY, lerp(3.5, 2.2, st));
+    cam.lookAt(lerp(0, 0, st), lerp(1.2, 1.15, st), lerp(1, 0, st));
+  } else if (p < 0.73) {
+    const st = easeInOut((p - 0.58) / 0.15);
+    cam.position.set(lerp(1.8, 0.8, st) + breathX + shakeX, lerp(1.8, 1.6, st) + breathY + shakeY, lerp(2.2, 2.5, st));
+    cam.lookAt(0, lerp(1.15, 1.1, st), lerp(0, -0.5, st));
+  } else if (p < 0.87) {
+    const st = easeInOut((p - 0.73) / 0.14);
+    cam.position.set(lerp(0.8, -0.8, st) + breathX + shakeX, lerp(1.6, 2.3, st) + breathY + shakeY, lerp(2.5, 4.5, st));
+    cam.lookAt(0, lerp(1.1, 1.2, st), lerp(-0.5, 1.5, st));
+  } else {
+    const st = easeInOut((p - 0.87) / 0.13);
+    cam.position.set(
+      lerp(-0.8, 0, st) + Math.sin(t * 0.25) * 0.15 + breathX,
+      lerp(2.3, 2.8, st) + breathY,
+      lerp(4.5, 6, st)
+    );
+    cam.lookAt(0, lerp(1.2, 1.3, st), lerp(1.5, 2, st));
+  }
+
+  // ---- PIZZA ANIMATION ----
+  const pg = sd.pizzaGroup;
+  const peel = sd.peelGroup;
+
+  const OVEN_INSIDE_Z = -0.2;
+  const PREP_Z = 2.5;
+  const SERVE_Z = 3.0;
+
+  if (p < 0.16) {
+    pg.visible = false;
+    peel.visible = false;
+  } else if (p < 0.28) {
+    pg.visible = true;
+    const st = smoothstep(0.16, 0.26, p);
+    pg.position.set(0, 1.2, lerp(5, PREP_Z, easeInOut(st)));
+    pg.rotation.y = st * Math.PI * 4;
+    pg.scale.setScalar(lerp(0.15, 1, easeInOut(st)));
+    sd.sauce.visible = false;
+    sd.cheese.visible = false;
+    sd.cheeseBlobs.forEach(b => b.visible = false);
+    sd.toppings.forEach(tp => tp.visible = false);
+    sd.basilLeaves.forEach(l => l.visible = false);
+    peel.visible = false;
+  } else if (p < 0.42) {
+    pg.position.set(0, 1.2, PREP_Z);
+    pg.rotation.y = 0;
+    pg.scale.setScalar(1);
+    const tp = smoothstep(0.29, 0.40, p);
+
+    sd.sauce.visible = tp > 0.08;
+    if (sd.sauce.visible) sd.sauce.scale.set(clamp((tp - 0.08) / 0.2, 0.01, 1), 1, clamp((tp - 0.08) / 0.2, 0.01, 1));
+
+    sd.cheese.visible = tp > 0.3;
+    if (sd.cheese.visible) sd.cheese.scale.set(clamp((tp - 0.3) / 0.2, 0.01, 1), 1, clamp((tp - 0.3) / 0.2, 0.01, 1));
+
+    sd.cheeseBlobs.forEach((b, i) => {
+      const thr = 0.35 + (i / sd.cheeseBlobs.length) * 0.3;
+      b.visible = tp > thr;
+      if (b.visible) b.scale.set(clamp((tp - thr) / 0.1, 0.01, 1), 0.4, clamp((tp - thr) / 0.1, 0.01, 1));
+    });
+
+    sd.toppings.forEach((top, i) => {
+      const thr = 0.45 + (i / sd.toppings.length) * 0.45;
+      top.visible = tp > thr;
+      if (top.visible) {
+        const s = clamp((tp - thr) / 0.08, 0, 1);
+        top.scale.setScalar(s);
+        top.position.y = 0.05 + (1 - s) * 0.15;
+      }
+    });
+
+    sd.basilLeaves.forEach((l, i) => {
+      const thr = 0.8 + (i / sd.basilLeaves.length) * 0.15;
+      l.visible = tp > thr;
+    });
+  } else if (p < 0.58) {
+    const st = smoothstep(0.42, 0.55, p);
+    [sd.sauce, sd.cheese].forEach(m => { m.visible = true; m.scale.set(1, 1, 1); });
+    sd.cheeseBlobs.forEach(b => b.visible = true);
+    sd.toppings.forEach(t => { t.visible = true; t.scale.setScalar(1); t.position.y = 0.05; });
+    sd.basilLeaves.forEach(l => l.visible = true);
+
+    pg.position.set(0, 1.15, lerp(PREP_Z, OVEN_INSIDE_Z, easeInOut(st)));
+    peel.visible = st > 0.02 && st < 0.9;
+    peel.position.set(0, 1.12, lerp(PREP_Z, OVEN_INSIDE_Z, easeInOut(st)));
+  } else if (p < 0.73) {
+    peel.visible = false;
+    const st = (p - 0.58) / 0.15;
+    pg.position.set(0, 1.15, OVEN_INSIDE_Z);
+    pg.rotation.y = st * Math.PI * 5;
+
+    const r = lerp(0.9, 0.65, st);
+    const g = lerp(0.84, 0.5, st);
+    const b = lerp(0.69, 0.3, st);
+    sd.doughMat.color.setRGB(r, g, b);
+    sd.crustMat.color.setRGB(lerp(0.78, 0.45, st), lerp(0.63, 0.3, st), lerp(0.38, 0.15, st));
+  } else if (p < 0.87) {
+    const st = smoothstep(0.73, 0.84, p);
+    pg.position.set(0, 1.15, lerp(OVEN_INSIDE_Z, SERVE_Z, easeInOut(st)));
+    pg.rotation.y = Math.PI * 5 + st * Math.PI;
+
+    peel.visible = st > 0.03 && st < 0.88;
+    peel.position.set(0, 1.12, lerp(OVEN_INSIDE_Z, SERVE_Z, easeInOut(st)));
+  } else {
+    peel.visible = false;
+    const st = easeInOut((p - 0.87) / 0.13);
+    pg.position.set(0, lerp(1.15, 1.4, st), SERVE_Z);
+    pg.rotation.y += 0.006;
+    pg.scale.setScalar(lerp(1, 1.18, st));
+  }
+
+  updateTextOverlay();
+  // Use composer (bloom) instead of raw renderer
+  composer.render();
+}
+
+animate();
+
+// ============================================
+// RESIZE
+// ============================================
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  bloomPass.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
