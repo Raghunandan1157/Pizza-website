@@ -16,12 +16,10 @@
     --ash: #232323;
     --cream: #FFF8F0;
     --white: #FFFFFF;
-    --cream-dim: rgba(255,248,240,0.7);
-    --cream-faint: rgba(255,248,240,0.45);
-    --cream-ghost: rgba(255,248,240,0.1);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   html { scroll-behavior: smooth; }
 
   body {
@@ -31,17 +29,36 @@
     overflow-x: hidden;
   }
 
-  /* Grain overlay */
+  /* Grain noise texture overlay */
   body::after {
     content: '';
     position: fixed;
-    inset: 0;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 9999;
   }
 
-  /* ─── NAV ─── */
+  /* ===================== SCROLL ANIMATIONS ===================== */
+  .anim {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .anim.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* stagger children */
+  .anim.visible.d1 { transition-delay: 0.08s; }
+  .anim.visible.d2 { transition-delay: 0.16s; }
+  .anim.visible.d3 { transition-delay: 0.24s; }
+  .anim.visible.d4 { transition-delay: 0.32s; }
+  .anim.visible.d5 { transition-delay: 0.40s; }
+  .anim.visible.d6 { transition-delay: 0.48s; }
+
+  /* ===================== NAV ===================== */
   nav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -50,16 +67,16 @@
     align-items: center;
     padding: 1.5rem 3rem;
     z-index: 100;
-    background: linear-gradient(180deg, rgba(26,26,26,0.95) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(26,26,26,0.97) 0%, rgba(26,26,26,0.6) 60%, transparent 100%);
   }
 
   .nav-left {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1.5rem;
   }
 
-  .back-btn {
+  .btn-back {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -69,25 +86,34 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     font-weight: 500;
-    padding: 0.5rem 1rem;
-    border: 1px solid rgba(255,179,71,0.3);
+    padding: 0.45rem 1rem;
+    border: 1px solid rgba(255,179,71,0.35);
     transition: all 0.3s;
   }
-
-  .back-btn:hover {
+  .btn-back:hover {
     color: var(--fire);
     border-color: var(--fire);
+    box-shadow: 0 0 12px rgba(255,69,0,0.15);
   }
 
   .logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.2rem;
+    font-size: 2rem;
     letter-spacing: 4px;
-    color: var(--fire);
-    text-shadow: 0 0 30px rgba(255,69,0,0.5);
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    user-select: none;
   }
-
-  .logo span { color: var(--gold); }
+  .logo .l-ember { color: var(--cream); }
+  .logo .l-amp {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.6rem;
+    margin: 0 3px;
+  }
+  .logo .l-stone { color: var(--fire); }
 
   nav ul {
     display: flex;
@@ -95,17 +121,16 @@
     gap: 2.5rem;
   }
 
-  nav a.nav-link {
+  nav a {
     color: var(--cream);
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     font-weight: 500;
     transition: color 0.3s;
   }
-
-  nav a.nav-link:hover { color: var(--fire); }
+  nav a:hover { color: var(--fire); }
 
   .btn-order {
     background: var(--fire);
@@ -119,14 +144,13 @@
     transition: all 0.3s;
     clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
   }
-
   .btn-order:hover {
     background: var(--gold);
     transform: scale(1.05);
     box-shadow: 0 0 40px rgba(255,69,0,0.4);
   }
 
-  /* ─── HERO (V1 centered style) ─── */
+  /* ===================== HERO ===================== */
   .hero {
     min-height: 100vh;
     display: flex;
@@ -141,6 +165,7 @@
     inset: 0;
     background: radial-gradient(ellipse at 50% 80%, rgba(255,69,0,0.15) 0%, transparent 60%),
                 radial-gradient(ellipse at 80% 20%, rgba(255,107,53,0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 20% 30%, rgba(255,179,71,0.05) 0%, transparent 35%),
                 var(--charcoal);
   }
 
@@ -153,34 +178,55 @@
     height: 500px;
     background: radial-gradient(ellipse, rgba(255,69,0,0.3) 0%, rgba(255,107,53,0.1) 40%, transparent 70%);
     animation: flicker 3s ease-in-out infinite alternate;
+    will-change: transform, opacity;
   }
 
   @keyframes flicker {
-    0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-    50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    0%   { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    33%  { opacity: 0.9; transform: translateX(-50%) scale(1.03); }
+    66%  { opacity: 0.75; transform: translateX(-50%) scale(1.06); }
     100% { opacity: 0.7; transform: translateX(-50%) scale(0.98); }
   }
 
-  /* Spinning pizza ring from V1 */
+  /* Primary spinning emoji ring */
   .pizza-ring {
     position: absolute;
     width: 700px;
     height: 700px;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     animation: spinSlow 60s linear infinite;
     opacity: 0.08;
+    pointer-events: none;
+  }
+  /* Second larger ring */
+  .pizza-ring-2 {
+    position: absolute;
+    width: 900px;
+    height: 900px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: spinSlow2 80s linear infinite;
+    opacity: 0.04;
+    pointer-events: none;
   }
 
   @keyframes spinSlow {
     to { transform: translate(-50%, -50%) rotate(360deg); }
   }
+  @keyframes spinSlow2 {
+    to { transform: translate(-50%, -50%) rotate(-360deg); }
+  }
 
-  .pizza-ring span {
+  .pizza-ring span,
+  .pizza-ring-2 span {
     position: absolute;
     font-size: 3rem;
     top: 50%; left: 50%;
   }
+  .pizza-ring-2 span { font-size: 2.5rem; }
 
   .pizza-ring span:nth-child(1) { transform: rotate(0deg) translateY(-350px); }
   .pizza-ring span:nth-child(2) { transform: rotate(45deg) translateY(-350px); }
@@ -190,6 +236,15 @@
   .pizza-ring span:nth-child(6) { transform: rotate(225deg) translateY(-350px); }
   .pizza-ring span:nth-child(7) { transform: rotate(270deg) translateY(-350px); }
   .pizza-ring span:nth-child(8) { transform: rotate(315deg) translateY(-350px); }
+
+  .pizza-ring-2 span:nth-child(1) { transform: rotate(0deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(2) { transform: rotate(45deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(3) { transform: rotate(90deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(4) { transform: rotate(135deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(5) { transform: rotate(180deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(6) { transform: rotate(225deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(7) { transform: rotate(270deg) translateY(-450px); }
+  .pizza-ring-2 span:nth-child(8) { transform: rotate(315deg) translateY(-450px); }
 
   .hero-content {
     position: relative;
@@ -224,74 +279,33 @@
     animation: riseUp 1.2s ease-out 0.1s both;
   }
 
-  /* V2 touch: elegant italic subtitle */
   .hero-subtitle {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
     color: var(--terracotta);
-    margin: 1rem 0;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
     animation: riseUp 1.2s ease-out 0.25s both;
+    letter-spacing: 1px;
   }
 
   .hero p {
     font-size: 1.15rem;
-    color: var(--cream-faint);
-    max-width: 500px;
+    color: rgba(255,248,240,0.7);
+    max-width: 520px;
     margin: 1.5rem auto 2rem;
     line-height: 1.7;
     animation: riseUp 1.2s ease-out 0.3s both;
   }
 
-  .hero-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
+  .hero .btn-order {
     animation: riseUp 1.2s ease-out 0.4s both;
-  }
-
-  .btn-hero {
-    background: var(--fire);
-    color: var(--white);
-    border: none;
-    padding: 1rem 3rem;
-    font-family: 'Bebas Neue', sans-serif;
     font-size: 1.3rem;
-    letter-spacing: 3px;
-    cursor: pointer;
-    transition: all 0.3s;
-    clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+    padding: 1rem 3rem;
   }
 
-  .btn-hero:hover {
-    background: var(--gold);
-    transform: scale(1.05);
-    box-shadow: 0 0 40px rgba(255,69,0,0.4);
-  }
-
-  /* V2 touch: outline pill button */
-  .btn-hero-outline {
-    background: transparent;
-    color: var(--cream-dim);
-    border: 1.5px solid var(--cream-ghost);
-    padding: 0.85rem 2rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-weight: 500;
-    cursor: pointer;
-    border-radius: 100px;
-    transition: all 0.3s;
-  }
-
-  .btn-hero-outline:hover {
-    background: var(--cream);
-    color: var(--charcoal);
-    border-color: var(--cream);
-  }
-
-  /* ─── DIVIDER (V1) ─── */
+  /* ===================== DIVIDER ===================== */
   .divider {
     width: 100%;
     height: 4px;
@@ -299,37 +313,49 @@
     opacity: 0.6;
   }
 
-  /* ─── FEATURES BAR (V2 touch on V1 dark) ─── */
+  /* ===================== FEATURES STRIP ===================== */
   .features {
     background: var(--smoke);
-    display: flex;
-    justify-content: center;
-    gap: 5rem;
-    padding: 3.5rem 3rem;
+    padding: 5rem 3rem;
   }
 
-  .feature { text-align: center; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+  }
 
-  .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 0.6rem;
+  .feature {
+    padding: 1.5rem 1rem;
+  }
+
+  .feature-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
     display: block;
   }
 
   .feature h4 {
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    font-weight: 400;
+    font-style: italic;
+    font-size: 1.15rem;
     color: var(--cream);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.6rem;
+    font-weight: 400;
   }
 
   .feature p {
-    font-size: 0.72rem;
-    color: var(--cream-faint);
+    font-size: 0.82rem;
+    color: rgba(255,248,240,0.5);
+    line-height: 1.6;
+    max-width: 200px;
+    margin: 0 auto;
   }
 
-  /* ─── MENU (V1 card grid) ─── */
+  /* ===================== MENU ===================== */
   .menu {
     padding: 8rem 3rem;
     max-width: 1200px;
@@ -348,28 +374,19 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(3rem, 6vw, 5rem);
     color: var(--cream);
-    margin-bottom: 0.4rem;
-  }
-
-  /* V2 touch: italic subtitle */
-  .section-subtitle {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.05rem;
-    color: var(--cream-faint);
     margin-bottom: 4rem;
   }
 
   .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
   }
 
   .pizza-card {
     background: var(--smoke);
     border: 1px solid rgba(255,69,0,0.15);
-    padding: 2.5rem;
+    padding: 2.5rem 2rem 2rem;
     position: relative;
     overflow: hidden;
     transition: all 0.4s;
@@ -386,7 +403,6 @@
     transform-origin: left;
     transition: transform 0.4s;
   }
-
   .pizza-card:hover::before { transform: scaleX(1); }
 
   .pizza-card:hover {
@@ -398,46 +414,48 @@
   .card-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
+    align-items: center;
+    margin-bottom: 1.2rem;
   }
 
-  .pizza-icon { font-size: 3.5rem; }
+  .card-emoji {
+    font-size: 3rem;
+  }
 
-  /* V2 touch: tags/badges */
   .card-tag {
-    display: inline-block;
     font-size: 0.6rem;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 0.3rem 0.65rem;
-    border-radius: 4px;
-    font-weight: 600;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
     background: rgba(255,69,0,0.15);
-    color: var(--ember);
-  }
-
-  .card-tag.seasonal {
-    background: rgba(255,179,71,0.15);
     color: var(--gold);
+    white-space: nowrap;
   }
-
-  .card-tag.chefs {
-    background: rgba(255,248,240,0.08);
-    color: var(--cream-dim);
-  }
+  .card-tag.bestseller { background: rgba(255,69,0,0.25); color: var(--fire); }
+  .card-tag.seasonal { background: rgba(255,179,71,0.15); color: var(--gold); }
+  .card-tag.chefs { background: rgba(255,107,53,0.2); color: var(--ember); }
+  .card-tag.new { background: rgba(255,69,0,0.2); color: #ff8a65; }
 
   .pizza-card h3 {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.8rem;
     letter-spacing: 2px;
     color: var(--cream);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .heat-level {
+    font-size: 0.7rem;
+    margin-bottom: 0.8rem;
+    display: block;
+    letter-spacing: 2px;
   }
 
   .pizza-card .desc {
-    color: var(--cream-faint);
-    font-size: 0.9rem;
+    color: rgba(255,248,240,0.55);
+    font-size: 0.88rem;
     line-height: 1.6;
     margin-bottom: 1.5rem;
   }
@@ -453,36 +471,36 @@
     font-size: 2rem;
     color: var(--gold);
   }
-
   .pizza-card .price span {
     font-size: 1rem;
-    color: var(--cream-faint);
+    color: rgba(255,248,240,0.4);
     font-family: 'DM Sans', sans-serif;
   }
 
-  .card-add {
+  .btn-add {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid var(--cream-ghost);
+    border: 1px solid rgba(255,248,240,0.2);
     background: transparent;
-    color: var(--cream-faint);
-    font-size: 1.2rem;
+    color: var(--cream);
+    font-size: 1.3rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: all 0.35s;
+    line-height: 1;
   }
-
-  .card-add:hover {
-    background: var(--fire);
+  .btn-add:hover {
     border-color: var(--fire);
-    color: var(--white);
+    color: var(--fire);
+    background: rgba(255,69,0,0.1);
     transform: rotate(90deg);
+    box-shadow: 0 0 16px rgba(255,69,0,0.2);
   }
 
-  /* ─── STORY (V1 layout) ─── */
+  /* ===================== STORY ===================== */
   .story {
     padding: 8rem 3rem;
     display: flex;
@@ -525,32 +543,39 @@
     opacity: 0.3;
   }
 
-  /* V2 touch: floating tags on story visual */
-  .story-tag {
+  /* Floating tags on story visual */
+  .float-tag {
     position: absolute;
-    z-index: 5;
-    background: var(--smoke);
-    border: 1px solid var(--cream-ghost);
-    padding: 0.5rem 0.9rem;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--cream-dim);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    animation: floatTag 4.5s ease-in-out infinite;
+    background: rgba(45,45,45,0.9);
+    border: 1px solid rgba(255,248,240,0.15);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    color: var(--cream);
     white-space: nowrap;
+    z-index: 2;
+    backdrop-filter: blur(8px);
   }
 
-  .story-tag:nth-child(2) { top: 10%; right: -20px; animation-delay: 0s; }
-  .story-tag:nth-child(3) { bottom: 15%; left: -24px; animation-delay: 1s; }
-  .story-tag:nth-child(4) { top: 50%; left: -30px; animation-delay: 0.5s; }
+  .float-tag:nth-child(2) {
+    top: 12%;
+    right: -30px;
+    animation: floatTag 5s ease-in-out infinite;
+  }
+  .float-tag:nth-child(3) {
+    bottom: 20%;
+    left: -25px;
+    animation: floatTag 5s ease-in-out 1.5s infinite;
+  }
+  .float-tag:nth-child(4) {
+    top: 55%;
+    right: -35px;
+    animation: floatTag 5s ease-in-out 3s infinite;
+  }
 
   @keyframes floatTag {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-10px); }
   }
 
   .story-text { max-width: 450px; }
@@ -559,26 +584,13 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 3.5rem;
     color: var(--cream);
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
     line-height: 1;
   }
-
-  .story-text h2 em {
-    font-style: normal;
-    color: var(--fire);
-  }
-
-  /* V2 touch: italic tagline */
-  .story-tagline {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: var(--terracotta);
-    margin-bottom: 1.5rem;
-  }
+  .story-text h2 span { color: var(--fire); }
 
   .story-text p {
-    color: var(--cream-faint);
+    color: rgba(255,248,240,0.6);
     line-height: 1.8;
     margin-bottom: 1rem;
   }
@@ -588,6 +600,8 @@
     gap: 3rem;
     margin-top: 2.5rem;
   }
+
+  .stat { text-align: left; }
 
   .stat-num {
     font-family: 'Bebas Neue', sans-serif;
@@ -599,51 +613,52 @@
     font-size: 0.75rem;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--cream-faint);
+    color: rgba(255,248,240,0.4);
   }
 
-  /* ─── TESTIMONIALS (V2 touch) ─── */
+  /* ===================== TESTIMONIALS ===================== */
   .testimonials {
-    padding: 8rem 3rem;
     background: var(--smoke);
-    text-align: center;
+    padding: 8rem 3rem;
+  }
+
+  .testimonials-inner {
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .test-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    max-width: 1100px;
-    margin: 3rem auto 0;
+    margin-top: 4rem;
   }
 
   .test-card {
     background: var(--charcoal);
-    border: 1px solid var(--cream-ghost);
+    border: 1px solid rgba(255,69,0,0.12);
     padding: 2.5rem 2rem;
-    text-align: left;
     transition: all 0.4s;
   }
-
   .test-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(255,69,0,0.2);
-    box-shadow: 0 16px 48px rgba(255,69,0,0.06);
+    border-color: rgba(255,69,0,0.35);
+    box-shadow: 0 12px 40px rgba(255,69,0,0.08);
   }
 
   .test-stars {
     color: var(--gold);
-    font-size: 0.85rem;
-    letter-spacing: 2px;
-    margin-bottom: 1rem;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    margin-bottom: 1.5rem;
   }
 
   .test-quote {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: 1.05rem;
+    font-size: 1rem;
+    color: rgba(255,248,240,0.75);
     line-height: 1.7;
-    color: var(--cream-dim);
     margin-bottom: 1.5rem;
   }
 
@@ -651,18 +666,18 @@
     width: 30px;
     height: 2px;
     background: linear-gradient(90deg, var(--fire), var(--gold));
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
   }
 
   .test-author {
-    font-size: 0.75rem;
-    letter-spacing: 1px;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--cream-faint);
-    font-weight: 600;
+    color: rgba(255,248,240,0.4);
+    font-weight: 500;
   }
 
-  /* ─── CTA (V1 style) ─── */
+  /* ===================== CTA ===================== */
   .cta {
     padding: 10rem 3rem;
     text-align: center;
@@ -675,6 +690,16 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(ellipse at center, rgba(255,69,0,0.15) 0%, transparent 60%);
+  }
+
+  .cta-lead {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--terracotta);
+    margin-bottom: 1.5rem;
+    position: relative;
+    letter-spacing: 1px;
   }
 
   .cta h2 {
@@ -690,31 +715,20 @@
     text-shadow: 0 0 60px rgba(255,69,0,0.5);
   }
 
-  /* V2 touch: italic lead-in */
-  .cta .lead-in {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.3rem;
-    color: var(--terracotta);
-    position: relative;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-
   .cta p {
-    color: var(--cream-faint);
+    color: rgba(255,248,240,0.5);
     margin: 2rem auto;
     max-width: 400px;
     position: relative;
   }
 
-  .cta .btn-hero {
+  .cta .btn-order {
     position: relative;
     font-size: 1.4rem;
     padding: 1.1rem 3.5rem;
   }
 
-  /* ─── FOOTER ─── */
+  /* ===================== FOOTER ===================== */
   footer {
     border-top: 1px solid rgba(255,69,0,0.15);
     padding: 3rem;
@@ -725,7 +739,7 @@
     gap: 1rem;
   }
 
-  footer .logo { font-size: 1.5rem; }
+  footer .logo { font-size: 1.5rem; letter-spacing: 3px; }
 
   footer p {
     color: rgba(255,248,240,0.3);
@@ -744,251 +758,424 @@
     letter-spacing: 1px;
     transition: color 0.3s;
   }
-
   footer .socials a:hover { color: var(--fire); }
 
-  /* ─── RESPONSIVE ─── */
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 1024px) {
+    .menu-grid { grid-template-columns: repeat(2, 1fr); }
+    .test-grid { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  }
+
   @media (max-width: 768px) {
     nav { padding: 1rem 1.5rem; }
     nav ul { display: none; }
-    .features { flex-wrap: wrap; gap: 2rem; padding: 2.5rem 1.5rem; }
+
+    .hero h1 { font-size: clamp(3.5rem, 14vw, 8rem); }
+    .hero-subtitle { font-size: 1rem; }
+
     .menu { padding: 5rem 1.5rem; }
-    .story { padding: 5rem 1.5rem; gap: 3rem; }
-    .story-visual { width: 280px; height: 350px; }
-    .stats { gap: 2rem; }
+    .menu-grid { grid-template-columns: 1fr; }
+
+    .features { padding: 3.5rem 1.5rem; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+
+    .story {
+      padding: 5rem 1.5rem;
+      flex-direction: column;
+      gap: 3rem;
+      text-align: center;
+    }
+    .story-visual {
+      width: 280px;
+      height: 350px;
+    }
+    .float-tag:nth-child(2) { right: -10px; }
+    .float-tag:nth-child(3) { left: -10px; }
+    .float-tag:nth-child(4) { right: -15px; }
+
+    .stats { gap: 2rem; justify-content: center; }
+    .stat { text-align: center; }
+
     .testimonials { padding: 5rem 1.5rem; }
     .test-grid { grid-template-columns: 1fr; }
+
     .cta { padding: 6rem 1.5rem; }
-    footer { padding: 2rem 1.5rem; }
+
+    footer {
+      padding: 2rem 1.5rem;
+      flex-direction: column;
+      text-align: center;
+      gap: 1.5rem;
+    }
+
+    .pizza-ring { width: 500px; height: 500px; }
+    .pizza-ring span { font-size: 2rem; }
+    .pizza-ring span:nth-child(1) { transform: rotate(0deg) translateY(-250px); }
+    .pizza-ring span:nth-child(2) { transform: rotate(45deg) translateY(-250px); }
+    .pizza-ring span:nth-child(3) { transform: rotate(90deg) translateY(-250px); }
+    .pizza-ring span:nth-child(4) { transform: rotate(135deg) translateY(-250px); }
+    .pizza-ring span:nth-child(5) { transform: rotate(180deg) translateY(-250px); }
+    .pizza-ring span:nth-child(6) { transform: rotate(225deg) translateY(-250px); }
+    .pizza-ring span:nth-child(7) { transform: rotate(270deg) translateY(-250px); }
+    .pizza-ring span:nth-child(8) { transform: rotate(315deg) translateY(-250px); }
+
+    .pizza-ring-2 { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .stats { flex-direction: column; gap: 1.5rem; }
   }
 </style>
 </head>
 <body>
 
+<!-- ============== NAV ============== -->
 <nav>
   <div class="nav-left">
-    <a href="index.html" class="back-btn">← Back</a>
-    <div class="logo">EMBER<span>&</span>STONE</div>
+    <a href="index.html" class="btn-back">&larr; Back</a>
+    <div class="logo">
+      <span class="l-ember">EMBER</span>
+      <span class="l-amp">&amp;</span>
+      <span class="l-stone">STONE</span>
+    </div>
   </div>
   <ul>
-    <li><a href="#menu" class="nav-link">Menu</a></li>
-    <li><a href="#story" class="nav-link">Our Story</a></li>
-    <li><a href="#reviews" class="nav-link">Reviews</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
   </ul>
   <button class="btn-order">ORDER NOW</button>
 </nav>
 
-<!-- HERO (V1 centered layout) -->
+<!-- ============== HERO ============== -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="fire-glow"></div>
+  <div class="fire-glow" id="fireGlow"></div>
+
   <div class="pizza-ring">
     <span>🍕</span><span>🔥</span><span>🍕</span><span>🔥</span>
     <span>🍕</span><span>🔥</span><span>🍕</span><span>🔥</span>
   </div>
+  <div class="pizza-ring-2">
+    <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
+    <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
+  </div>
+
   <div class="hero-content">
     <p class="hero-tag">Wood-Fired &bull; Handcrafted &bull; Legendary</p>
     <h1>FORGED<br>IN FIRE</h1>
-    <p class="hero-subtitle">Where flame meets finesse</p>
-    <p>Every pizza is born in our 900°F stone hearth. Slow-fermented dough, local ingredients, and generations of craft — forged into blistered perfection.</p>
-    <div class="hero-buttons">
-      <button class="btn-hero">IGNITE YOUR ORDER</button>
-      <button class="btn-hero-outline">Our Story</button>
+    <div class="hero-subtitle">Where flame meets finesse</div>
+    <p>Every pizza is forged in our 900&deg;F wood-fired oven. No shortcuts. No compromises. Just pure, blistered perfection.</p>
+    <button class="btn-order">IGNITE YOUR ORDER</button>
+  </div>
+</section>
+
+<!-- ============== DIVIDER ============== -->
+<div class="divider"></div>
+
+<!-- ============== FEATURES STRIP ============== -->
+<section class="features">
+  <div class="features-grid">
+    <div class="feature anim">
+      <span class="feature-emoji">🌾</span>
+      <h4>72-Hour Dough</h4>
+      <p>Slow-fermented for three days. Complex flavor, cloud-like crumb, unmistakable char.</p>
+    </div>
+    <div class="feature anim d1">
+      <span class="feature-emoji">🧑‍🌾</span>
+      <h4>Farm Sourced</h4>
+      <p>Every ingredient traced to its origin. San Marzano DOP, hand-pulled mozzarella, local herbs.</p>
+    </div>
+    <div class="feature anim d2">
+      <span class="feature-emoji">🔥</span>
+      <h4>900&deg;F Hearth</h4>
+      <p>White oak-fired stone hearth. Ninety seconds is all it takes to reach blistered perfection.</p>
+    </div>
+    <div class="feature anim d3">
+      <span class="feature-emoji">✨</span>
+      <h4>The Ritual</h4>
+      <p>Each pie is hand-stretched, sauced, and launched by a single pizzaiolo. No assembly lines.</p>
     </div>
   </div>
 </section>
 
+<!-- ============== DIVIDER ============== -->
 <div class="divider"></div>
 
-<!-- FEATURES (V2 touch) -->
-<div class="features">
-  <div class="feature">
-    <span class="feature-icon">🌾</span>
-    <h4>72-Hour Dough</h4>
-    <p>Cold-fermented for depth</p>
-  </div>
-  <div class="feature">
-    <span class="feature-icon">🧑‍🌾</span>
-    <h4>Farm Sourced</h4>
-    <p>Ingredients we know by name</p>
-  </div>
-  <div class="feature">
-    <span class="feature-icon">🔥</span>
-    <h4>900°F Hearth</h4>
-    <p>Hand-built stone oven</p>
-  </div>
-  <div class="feature">
-    <span class="feature-icon">✨</span>
-    <h4>The Ritual</h4>
-    <p>Every pie crafted with intention</p>
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<!-- MENU (V1 card grid with V2 tags) -->
+<!-- ============== MENU ============== -->
 <section class="menu" id="menu">
-  <p class="section-label">The Menu</p>
-  <h2 class="section-title">Our Signatures</h2>
-  <p class="section-subtitle">Simple ingredients, extraordinary fire</p>
+  <p class="section-label anim">The Menu</p>
+  <h2 class="section-title anim">Our Signatures</h2>
   <div class="menu-grid">
-    <div class="pizza-card">
+
+    <div class="pizza-card anim">
       <div class="card-top">
-        <div class="pizza-icon">🔥</div>
-        <span class="card-tag">Bestseller</span>
+        <span class="card-emoji">🔥</span>
+        <span class="card-tag bestseller">Bestseller</span>
       </div>
       <h3>THE INFERNO</h3>
-      <p class="desc">San Marzano tomatoes, fiordilatte mozzarella, Calabrian chili, 'nduja, hot honey drizzle, fresh basil</p>
+      <div class="heat-level">🔥🔥🔥</div>
+      <p class="desc">San Marzano, fiordilatte, Calabrian chili, 'nduja, hot honey, basil</p>
       <div class="card-bottom">
         <div class="price">$18 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
+        <button class="btn-add" aria-label="Add to order">+</button>
       </div>
     </div>
-    <div class="pizza-card">
+
+    <div class="pizza-card anim d1">
       <div class="card-top">
-        <div class="pizza-icon">🍄</div>
+        <span class="card-emoji">🍄</span>
         <span class="card-tag seasonal">Seasonal</span>
       </div>
       <h3>FOREST FLOOR</h3>
-      <p class="desc">Truffle cream base, wild mushroom medley, fontina, thyme, garlic confit, arugula, shaved parmesan</p>
+      <div class="heat-level">🔥</div>
+      <p class="desc">Truffle cream, wild mushrooms, fontina, thyme, garlic confit, parmesan</p>
       <div class="card-bottom">
         <div class="price">$21 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
+        <button class="btn-add" aria-label="Add to order">+</button>
       </div>
     </div>
-    <div class="pizza-card">
+
+    <div class="pizza-card anim d2">
       <div class="card-top">
-        <div class="pizza-icon">🌿</div>
+        <span class="card-emoji">🌿</span>
       </div>
       <h3>THE PURIST</h3>
-      <p class="desc">Classic Margherita. San Marzano DOP, buffalo mozzarella, extra virgin olive oil, fresh basil. Nothing else needed.</p>
+      <div class="heat-level">🔥</div>
+      <p class="desc">Margherita. San Marzano DOP, buffalo mozzarella, EVOO, basil</p>
       <div class="card-bottom">
         <div class="price">$16 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
+        <button class="btn-add" aria-label="Add to order">+</button>
       </div>
     </div>
-    <div class="pizza-card">
+
+    <div class="pizza-card anim d3">
       <div class="card-top">
-        <div class="pizza-icon">🍯</div>
+        <span class="card-emoji">🍯</span>
         <span class="card-tag chefs">Chef's Pick</span>
       </div>
-      <h3>SMOKE & HONEY</h3>
-      <p class="desc">Smoked mozzarella, spicy sopressata, caramelized onions, Mike's hot honey, cracked black pepper</p>
+      <h3>SMOKE &amp; HONEY</h3>
+      <div class="heat-level">🔥🔥</div>
+      <p class="desc">Smoked mozz, sopressata, caramelized onions, hot honey, black pepper</p>
       <div class="card-bottom">
         <div class="price">$19 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
+        <button class="btn-add" aria-label="Add to order">+</button>
       </div>
     </div>
-    <div class="pizza-card">
+
+    <div class="pizza-card anim d4">
       <div class="card-top">
-        <div class="pizza-icon">🧄</div>
-        <span class="card-tag seasonal">New</span>
+        <span class="card-emoji">🧄</span>
+        <span class="card-tag new">New</span>
       </div>
       <h3>MIDNIGHT GARLIC</h3>
-      <p class="desc">Black garlic cream, roasted garlic cloves, burrata, charred scallions, chili flake, olive oil</p>
+      <div class="heat-level">🔥🔥</div>
+      <p class="desc">Black garlic cream, roasted garlic, burrata, charred scallions, chili, olive oil</p>
       <div class="card-bottom">
         <div class="price">$20 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
+        <button class="btn-add" aria-label="Add to order">+</button>
       </div>
     </div>
-    <div class="pizza-card">
+
+    <div class="pizza-card anim d5">
       <div class="card-top">
-        <div class="pizza-icon">🍖</div>
+        <span class="card-emoji">🍖</span>
       </div>
       <h3>THE BUTCHER</h3>
-      <p class="desc">Red sauce, Italian sausage, pepperoni, pancetta, capicollo, roasted peppers, aged provolone</p>
+      <div class="heat-level">🔥🔥</div>
+      <p class="desc">Red sauce, sausage, pepperoni, pancetta, capicollo, roasted peppers, provolone</p>
       <div class="card-bottom">
         <div class="price">$22 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
+        <button class="btn-add" aria-label="Add to order">+</button>
       </div>
     </div>
+
   </div>
 </section>
 
+<!-- ============== DIVIDER ============== -->
 <div class="divider"></div>
 
-<!-- STORY (V1 layout with V2 floating tags) -->
+<!-- ============== STORY ============== -->
 <section class="story" id="story">
-  <div class="story-visual">
+  <div class="story-visual anim">
     <div class="big-emoji">🍕</div>
-    <div class="story-tag">🔥 900°F Stone</div>
-    <div class="story-tag">🌾 72hr Ferment</div>
-    <div class="story-tag">🪵 White Oak</div>
+    <div class="float-tag">🔥 900&deg;F Stone</div>
+    <div class="float-tag">🌾 72hr Ferment</div>
+    <div class="float-tag">🪵 White Oak</div>
   </div>
   <div class="story-text">
-    <p class="section-label">Our Story</p>
-    <h2>OBSESSED WITH <em>FIRE</em> SINCE DAY ONE</h2>
-    <p class="story-tagline">Three years of flame, one unwavering standard</p>
-    <p>We started Ember & Stone in a backyard with a hand-built brick oven and one dream: make pizza that makes people close their eyes on the first bite.</p>
-    <p>Three years later, we haven't changed a thing — except now more people are closing their eyes.</p>
+    <p class="section-label anim">Our Story</p>
+    <h2 class="anim">OBSESSED WITH <span>FIRE</span> SINCE DAY ONE</h2>
+    <p class="anim">We started Ember &amp; Stone in a backyard with a hand-built brick oven and one dream: make pizza that makes people close their eyes on the first bite.</p>
+    <p class="anim">Three years later, we haven't changed a thing &mdash; except now more people are closing their eyes.</p>
     <div class="stats">
-      <div>
-        <div class="stat-num">900°</div>
+      <div class="stat anim">
+        <div class="stat-num" data-target="900" data-suffix="°">0°</div>
         <div class="stat-label">Oven Temp</div>
       </div>
-      <div>
-        <div class="stat-num">72hr</div>
+      <div class="stat anim d1">
+        <div class="stat-num" data-target="72" data-suffix="hr">0hr</div>
         <div class="stat-label">Dough Ferment</div>
       </div>
-      <div>
-        <div class="stat-num">90s</div>
+      <div class="stat anim d2">
+        <div class="stat-num" data-target="90" data-suffix="s">0s</div>
         <div class="stat-label">Cook Time</div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ============== DIVIDER ============== -->
 <div class="divider"></div>
 
-<!-- TESTIMONIALS (V2 touch on V1 dark) -->
-<section class="testimonials" id="reviews">
-  <p class="section-label">What People Say</p>
-  <h2 class="section-title">VOICES FROM THE TABLE</h2>
-  <p class="section-subtitle" style="margin-bottom:0;">Words that warm us like our oven</p>
-  <div class="test-grid">
-    <div class="test-card">
-      <div class="test-stars">★★★★★</div>
-      <div class="test-quote">"The char on that crust, the way the mozzarella pools — this is the closest to Naples without the plane ticket. Absolutely transcendent."</div>
-      <div class="test-line"></div>
-      <div class="test-author">Sarah M. — Food Blogger</div>
-    </div>
-    <div class="test-card">
-      <div class="test-stars">★★★★★</div>
-      <div class="test-quote">"My kids now refuse frozen pizza. Thanks a lot, Ember & Stone. We're here every Friday."</div>
-      <div class="test-line"></div>
-      <div class="test-author">James L. — Friday Regular</div>
-    </div>
-    <div class="test-card">
-      <div class="test-stars">★★★★★</div>
-      <div class="test-quote">"The Smoke & Honey changed my life. That hot honey with the char — I dream about it. No exaggeration."</div>
-      <div class="test-line"></div>
-      <div class="test-author">Maya T. — Yelp Elite</div>
+<!-- ============== TESTIMONIALS ============== -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-inner">
+    <p class="section-label anim">What They Say</p>
+    <h2 class="section-title anim">Straight From The Table</h2>
+    <div class="test-grid">
+
+      <div class="test-card anim">
+        <div class="test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="test-quote">"The char on that crust, the way the mozzarella pools &mdash; closest to Naples without the plane ticket."</p>
+        <div class="test-line"></div>
+        <p class="test-author">Sarah M., Food Blogger</p>
+      </div>
+
+      <div class="test-card anim d1">
+        <div class="test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="test-quote">"My kids now refuse frozen pizza. Thanks a lot, Ember &amp; Stone. We're here every Friday."</p>
+        <div class="test-line"></div>
+        <p class="test-author">James L., Friday Regular</p>
+      </div>
+
+      <div class="test-card anim d2">
+        <div class="test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="test-quote">"The Smoke &amp; Honey changed my life. That hot honey with the char &mdash; I dream about it."</p>
+        <div class="test-line"></div>
+        <p class="test-author">Maya T., Yelp Elite</p>
+      </div>
+
     </div>
   </div>
 </section>
 
+<!-- ============== DIVIDER ============== -->
 <div class="divider"></div>
 
-<!-- CTA (V1 style with V2 italic lead-in) -->
+<!-- ============== CTA ============== -->
 <section class="cta">
-  <h2>
-    <span class="lead-in">Your table is ready</span>
+  <p class="cta-lead anim">Your table is ready</p>
+  <h2 class="anim">
     <span class="line1">READY TO GET</span><br>
     <span class="line2">BURNED?</span>
   </h2>
-  <p>Free delivery on your first order. Use code <strong style="color:var(--gold);">FIRSTEMBER</strong> at checkout.</p>
-  <button class="btn-hero">ORDER NOW</button>
+  <p class="anim">Free delivery on your first order. Use code <strong style="color:var(--gold)">FIRSTFLAME</strong> at checkout.</p>
+  <button class="btn-order anim" style="position:relative;">ORDER NOW</button>
 </section>
 
+<!-- ============== FOOTER ============== -->
 <footer>
-  <div class="logo">EMBER<span>&</span>STONE</div>
+  <div class="logo">
+    <span class="l-ember">EMBER</span>
+    <span class="l-amp">&amp;</span>
+    <span class="l-stone">STONE</span>
+  </div>
   <div class="socials">
     <a href="#">Instagram</a>
     <a href="#">TikTok</a>
-    <a href="#">Yelp</a>
+    <a href="#">Twitter</a>
   </div>
-  <p>&copy; 2026 Ember & Stone Pizza Co. Forged with fire.</p>
+  <p>&copy; 2026 Ember &amp; Stone Pizza Co. All rights reserved.</p>
 </footer>
+
+<!-- ============== JAVASCRIPT ============== -->
+<script>
+(function() {
+  'use strict';
+
+  // ===== SCROLL ANIMATIONS (IntersectionObserver) =====
+  const animEls = document.querySelectorAll('.anim');
+  const observerOpts = { threshold: 0.15, rootMargin: '0px 0px -40px 0px' };
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOpts);
+
+  animEls.forEach(function(el) { observer.observe(el); });
+
+  // ===== ANIMATED STAT COUNTERS =====
+  let statsCounted = false;
+  const statNums = document.querySelectorAll('.stat-num[data-target]');
+
+  const statsObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting && !statsCounted) {
+        statsCounted = true;
+        statNums.forEach(function(el) {
+          const target = parseInt(el.getAttribute('data-target'), 10);
+          const suffix = el.getAttribute('data-suffix') || '';
+          const duration = 1500;
+          const startTime = performance.now();
+
+          function tick(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * target);
+            el.textContent = current + suffix;
+            if (progress < 1) {
+              requestAnimationFrame(tick);
+            }
+          }
+          requestAnimationFrame(tick);
+        });
+        statsObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  // observe the stats container
+  var statsSection = document.querySelector('.stats');
+  if (statsSection) statsObserver.observe(statsSection);
+
+  // ===== MOUSE-FOLLOW PARALLAX ON HERO FIRE GLOW =====
+  var fireGlow = document.getElementById('fireGlow');
+  var hero = document.querySelector('.hero');
+  if (fireGlow && hero) {
+    hero.addEventListener('mousemove', function(e) {
+      var rect = hero.getBoundingClientRect();
+      var centerX = rect.width / 2;
+      var centerY = rect.height / 2;
+      var mouseX = e.clientX - rect.left;
+      var mouseY = e.clientY - rect.top;
+
+      var offsetX = ((mouseX - centerX) / centerX) * 20;
+      var offsetY = ((mouseY - centerY) / centerY) * 20;
+
+      fireGlow.style.transform = 'translateX(calc(-50% + ' + offsetX + 'px)) translateY(' + offsetY + 'px)';
+    });
+
+    hero.addEventListener('mouseleave', function() {
+      fireGlow.style.transform = 'translateX(-50%)';
+      fireGlow.style.transition = 'transform 0.6s ease-out';
+      setTimeout(function() {
+        fireGlow.style.transition = '';
+      }, 600);
+    });
+  }
+
+})();
+</script>
 
 </body>
 </html>
