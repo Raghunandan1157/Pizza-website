@@ -3,39 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ember & Stone — Wood-Fired Artisan Pizza</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Ember & Stone — Forged in Fire</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #FDFAF6;
+    --bg: #FFFBF5;
     --surface: #FFFFFF;
-    --surface-warm: #F7F2EB;
-    --sand: #EDE6DA;
-    --border: rgba(62,44,35,0.08);
-    --border-hover: rgba(196,112,75,0.25);
-    --terracotta: #C4704B;
-    --terra-light: #D4845F;
-    --terra-dark: #A85A3A;
-    --gold: #C8982E;
-    --gold-light: #D4A83E;
-    --ember: #B85C3A;
-    --olive: #6B7A5E;
-    --brown: #3E2C23;
-    --brown-dim: rgba(62,44,35,0.65);
-    --brown-faint: rgba(62,44,35,0.4);
-    --brown-ghost: rgba(62,44,35,0.06);
+    --warm: #F8F2E9;
+    --sand: #EDE5D6;
+    --fire: #E04520;
+    --ember: #D45A2E;
+    --gold: #C9952C;
+    --gold-light: #DBA83A;
+    --terracotta: #B5603B;
+    --brown: #2C1E15;
+    --brown-dim: rgba(44,30,21,0.65);
+    --brown-faint: rgba(44,30,21,0.4);
+    --brown-ghost: rgba(44,30,21,0.08);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Karla', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--brown);
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
   }
 
   /* Subtle cross texture */
@@ -43,7 +37,7 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C4704B' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C4704B' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
   }
@@ -55,68 +49,49 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 3.5rem;
+    padding: 1.5rem 3rem;
     z-index: 100;
-    background: rgba(253,250,246,0.92);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(255,251,245,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--brown-ghost);
   }
 
   .nav-left {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.2rem;
   }
 
   .back-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: var(--terracotta);
+    color: var(--fire);
     text-decoration: none;
-    font-size: 0.72rem;
-    letter-spacing: 1.5px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    font-weight: 600;
-    padding: 0.45rem 1rem;
-    border: 1px solid rgba(196,112,75,0.25);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(224,69,32,0.25);
     border-radius: 100px;
     transition: all 0.3s;
   }
 
   .back-btn:hover {
-    background: var(--terracotta);
+    background: var(--fire);
     color: var(--surface);
-    border-color: var(--terracotta);
+    border-color: var(--fire);
   }
 
   .logo {
-    display: flex;
-    align-items: baseline;
-    gap: 0.35rem;
-  }
-
-  .logo-ember {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
-    letter-spacing: 3px;
+    font-size: 2.2rem;
+    letter-spacing: 4px;
     color: var(--brown);
   }
 
-  .logo-amp {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.4rem;
-    color: var(--terracotta);
-    margin: 0 0.15rem;
-  }
-
-  .logo-stone {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
-    letter-spacing: 3px;
-    color: var(--terra-dark);
-  }
+  .logo span { color: var(--fire); }
 
   nav ul {
     display: flex;
@@ -127,211 +102,187 @@
   nav a.nav-link {
     color: var(--brown-faint);
     text-decoration: none;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     font-weight: 500;
     transition: color 0.3s;
   }
 
-  nav a.nav-link:hover { color: var(--terracotta); }
+  nav a.nav-link:hover { color: var(--fire); }
 
   .btn-order {
-    background: var(--terracotta);
+    background: var(--fire);
     color: var(--surface);
     border: none;
-    padding: 0.7rem 1.8rem;
-    font-family: 'Karla', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-weight: 600;
+    padding: 0.75rem 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
     cursor: pointer;
-    border-radius: 100px;
-    transition: all 0.4s;
-    position: relative;
-    overflow: hidden;
+    transition: all 0.3s;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
   }
 
-  .btn-order::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--brown);
-    opacity: 0;
-    transition: opacity 0.4s;
-    border-radius: 100px;
-  }
-
-  .btn-order:hover::before { opacity: 1; }
   .btn-order:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(196,112,75,0.2);
+    background: var(--brown);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(224,69,32,0.2);
   }
 
-  .btn-order span { position: relative; z-index: 1; }
-
-  /* ─── HERO ─── */
+  /* ─── HERO (V1 centered) ─── */
   .hero {
     min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     align-items: center;
-    padding: 0 3.5rem;
-    gap: 3rem;
+    justify-content: center;
     position: relative;
     overflow: hidden;
   }
 
-  /* Warm ambient glow */
-  .hero-glow {
+  .hero-bg {
     position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 80%, rgba(224,69,32,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(201,149,44,0.04) 0%, transparent 40%),
+                var(--bg);
+  }
+
+  .fire-glow {
+    position: absolute;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 800px;
-    height: 600px;
-    right: -50px;
-    bottom: -150px;
-    background: radial-gradient(ellipse, rgba(196,112,75,0.06) 0%, rgba(212,160,74,0.03) 40%, transparent 70%);
-    animation: glowPulse 6s ease-in-out infinite alternate;
-    pointer-events: none;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(224,69,32,0.08) 0%, rgba(201,149,44,0.03) 40%, transparent 70%);
+    animation: flicker 3s ease-in-out infinite alternate;
   }
 
-  .hero-glow-2 {
+  @keyframes flicker {
+    0% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    100% { opacity: 0.6; transform: translateX(-50%) scale(0.98); }
+  }
+
+  /* Spinning ring (V1) — subtle on light */
+  .pizza-ring {
     position: absolute;
-    width: 400px;
-    height: 400px;
-    left: 5%;
-    top: 15%;
-    background: radial-gradient(ellipse, rgba(107,122,94,0.05) 0%, transparent 60%);
-    pointer-events: none;
+    width: 700px;
+    height: 700px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: spinSlow 60s linear infinite;
+    opacity: 0.06;
   }
 
-  @keyframes glowPulse {
-    0% { opacity: 0.5; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.04); }
+  @keyframes spinSlow {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
   }
 
-  .hero-left {
+  .pizza-ring span {
+    position: absolute;
+    font-size: 3rem;
+    top: 50%; left: 50%;
+  }
+
+  .pizza-ring span:nth-child(1) { transform: rotate(0deg) translateY(-350px); }
+  .pizza-ring span:nth-child(2) { transform: rotate(45deg) translateY(-350px); }
+  .pizza-ring span:nth-child(3) { transform: rotate(90deg) translateY(-350px); }
+  .pizza-ring span:nth-child(4) { transform: rotate(135deg) translateY(-350px); }
+  .pizza-ring span:nth-child(5) { transform: rotate(180deg) translateY(-350px); }
+  .pizza-ring span:nth-child(6) { transform: rotate(225deg) translateY(-350px); }
+  .pizza-ring span:nth-child(7) { transform: rotate(270deg) translateY(-350px); }
+  .pizza-ring span:nth-child(8) { transform: rotate(315deg) translateY(-350px); }
+
+  .hero-content {
     position: relative;
+    text-align: center;
     z-index: 10;
-    padding-top: 3rem;
+    animation: riseUp 1.2s ease-out;
   }
 
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface);
-    border: 1px solid var(--sand);
-    padding: 0.5rem 1.3rem;
-    border-radius: 100px;
-    font-size: 0.68rem;
-    letter-spacing: 2.5px;
+  @keyframes riseUp {
+    from { opacity: 0; transform: translateY(60px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tag {
+    font-size: 0.85rem;
+    letter-spacing: 6px;
     text-transform: uppercase;
-    color: var(--olive);
-    font-weight: 600;
-    margin-bottom: 2.5rem;
-    animation: fadeUp 0.8s ease-out 0.1s both;
-    box-shadow: 0 2px 12px rgba(62,44,35,0.04);
-  }
-
-  .hero-badge .badge-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--terracotta);
-    border-radius: 50%;
-    animation: dotPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes dotPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; box-shadow: 0 0 8px rgba(196,112,75,0.3); }
+    color: var(--ember);
+    margin-bottom: 1.5rem;
+    animation: riseUp 1.2s ease-out 0.2s both;
   }
 
   .hero h1 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(3.5rem, 6vw, 6rem);
-    line-height: 0.92;
-    letter-spacing: 2px;
+    font-size: clamp(5rem, 15vw, 14rem);
+    line-height: 0.85;
+    letter-spacing: -2px;
     color: var(--brown);
-    margin-bottom: 0.6rem;
-    animation: fadeUp 0.8s ease-out 0.2s both;
+    animation: riseUp 1.2s ease-out 0.1s both;
   }
 
   .hero h1 .accent {
-    color: var(--terracotta);
+    color: var(--fire);
   }
 
-  .hero-sub {
+  .hero-subtitle {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: clamp(1.3rem, 2.5vw, 2rem);
-    color: var(--terra-light);
-    font-weight: 400;
-    margin-bottom: 1.5rem;
-    animation: fadeUp 0.8s ease-out 0.3s both;
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    color: var(--terracotta);
+    margin: 1rem 0;
+    animation: riseUp 1.2s ease-out 0.25s both;
   }
 
   .hero p {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     color: var(--brown-faint);
-    line-height: 1.85;
-    max-width: 420px;
-    font-weight: 300;
-    margin-bottom: 2.5rem;
-    animation: fadeUp 0.8s ease-out 0.4s both;
+    max-width: 500px;
+    margin: 1.5rem auto 2rem;
+    line-height: 1.7;
+    animation: riseUp 1.2s ease-out 0.3s both;
   }
 
   .hero-buttons {
     display: flex;
     gap: 1rem;
-    animation: fadeUp 0.8s ease-out 0.5s both;
+    justify-content: center;
+    animation: riseUp 1.2s ease-out 0.4s both;
   }
 
-  .btn-hero-primary {
-    background: var(--terracotta);
+  .btn-hero {
+    background: var(--fire);
     color: var(--surface);
     border: none;
-    padding: 0.85rem 2.2rem;
-    font-family: 'Karla', sans-serif;
-    font-size: 0.78rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-weight: 600;
+    padding: 1rem 3rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
     cursor: pointer;
-    border-radius: 100px;
-    transition: all 0.4s;
-    position: relative;
-    overflow: hidden;
+    transition: all 0.3s;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
   }
 
-  .btn-hero-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+  .btn-hero:hover {
     background: var(--brown);
-    opacity: 0;
-    transition: opacity 0.4s;
-    border-radius: 100px;
-  }
-
-  .btn-hero-primary:hover::before { opacity: 1; }
-  .btn-hero-primary span { position: relative; z-index: 1; }
-
-  .btn-hero-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(196,112,75,0.2);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(224,69,32,0.2);
   }
 
   .btn-hero-outline {
     background: transparent;
     color: var(--brown);
     border: 1.5px solid var(--brown);
-    padding: 0.85rem 2.2rem;
-    font-family: 'Karla', sans-serif;
-    font-size: 0.78rem;
+    padding: 0.85rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     border-radius: 100px;
     transition: all 0.3s;
@@ -343,197 +294,109 @@
     border-color: var(--brown);
   }
 
-  /* Hero right */
-  .hero-right {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    z-index: 10;
-    animation: fadeUp 1s ease-out 0.3s both;
+  /* ─── DIVIDER (V1 style, warm tones) ─── */
+  .divider {
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--fire), var(--gold), var(--fire), transparent);
+    opacity: 0.35;
   }
 
-  .hero-frame {
-    width: 420px;
-    height: 520px;
-    background: linear-gradient(160deg, var(--surface) 0%, var(--surface-warm) 50%, var(--sand) 100%);
-    border-radius: 240px 240px 24px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    border: 1px solid var(--sand);
-    overflow: hidden;
-    box-shadow: 0 30px 80px rgba(62,44,35,0.06), 0 0 0 1px rgba(62,44,35,0.03);
-  }
-
-  .hero-frame::before {
-    content: '';
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 280px;
-    height: 180px;
-    background: radial-gradient(ellipse, rgba(196,112,75,0.08) 0%, rgba(212,160,74,0.04) 50%, transparent 70%);
-  }
-
-  .hero-emoji {
-    font-size: 11rem;
-    position: relative;
-    z-index: 2;
-    animation: gentleFloat 5s ease-in-out infinite;
-    filter: drop-shadow(0 16px 32px rgba(62,44,35,0.1));
-  }
-
-  @keyframes gentleFloat {
-    0%, 100% { transform: translateY(0) rotate(-2deg); }
-    50% { transform: translateY(-12px) rotate(2deg); }
-  }
-
-  .floating-tag {
-    position: absolute;
-    z-index: 5;
-    background: var(--surface);
-    border: 1px solid var(--sand);
-    padding: 0.65rem 1.1rem;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--brown);
-    box-shadow: 0 6px 24px rgba(62,44,35,0.06);
-    animation: floatTag 4.5s ease-in-out infinite;
-    white-space: nowrap;
-  }
-
-  .floating-tag .tag-icon { font-size: 1rem; }
-  .floating-tag .tag-label { letter-spacing: 0.5px; }
-
-  .tag-1 { top: 12%; right: -16px; animation-delay: 0s; }
-  .tag-2 { bottom: 22%; left: -28px; animation-delay: 1.2s; }
-  .tag-3 { top: 42%; left: -36px; animation-delay: 0.6s; }
-
-  @keyframes floatTag {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(28px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ─── FEATURES BAR ─── */
+  /* ─── FEATURES (V2 touch) ─── */
   .features {
-    background: var(--surface-warm);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    background: var(--warm);
     display: flex;
     justify-content: center;
     gap: 5rem;
     padding: 3.5rem 3rem;
-    position: relative;
+    border-bottom: 1px solid var(--brown-ghost);
   }
 
-  .feature {
-    text-align: center;
-    transition: transform 0.3s;
-  }
-
-  .feature:hover { transform: translateY(-3px); }
+  .feature { text-align: center; }
 
   .feature-icon {
     font-size: 2rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
     display: block;
   }
 
   .feature h4 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 400;
     color: var(--brown);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
   }
 
   .feature p {
     font-size: 0.72rem;
     color: var(--brown-faint);
-    font-weight: 300;
-    letter-spacing: 0.5px;
   }
 
-  /* ─── MENU ─── */
+  /* ─── MENU (V1 card grid) ─── */
   .menu {
-    padding: 7rem 3.5rem;
+    padding: 8rem 3rem;
     max-width: 1200px;
     margin: 0 auto;
   }
 
-  .section-eyebrow {
-    font-size: 0.68rem;
-    letter-spacing: 5px;
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 6px;
     text-transform: uppercase;
-    color: var(--terracotta);
-    font-weight: 600;
-    margin-bottom: 0.75rem;
+    color: var(--ember);
+    margin-bottom: 1rem;
   }
 
   .section-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.8rem, 5vw, 4.5rem);
-    letter-spacing: 2px;
+    font-size: clamp(3rem, 6vw, 5rem);
     color: var(--brown);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
   }
 
   .section-subtitle {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: var(--brown-faint);
-    font-weight: 400;
-    margin-bottom: 3.5rem;
+    margin-bottom: 4rem;
   }
 
   .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
   }
 
   .pizza-card {
     background: var(--surface);
     border: 1px solid var(--sand);
-    border-radius: 16px;
-    padding: 2rem 2rem 1.8rem;
+    padding: 2.5rem;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: all 0.4s;
     cursor: pointer;
+    border-radius: 4px;
   }
 
   .pizza-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--terracotta), var(--gold));
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--fire), var(--gold));
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-    border-radius: 16px 16px 0 0;
+    transition: transform 0.4s;
   }
 
   .pizza-card:hover::before { transform: scaleX(1); }
 
   .pizza-card:hover {
-    border-color: var(--border-hover);
-    transform: translateY(-6px);
-    box-shadow: 0 24px 64px rgba(62,44,35,0.07), 0 0 0 1px rgba(196,112,75,0.06);
+    border-color: rgba(224,69,32,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(44,30,21,0.06);
   }
 
   .card-top {
@@ -543,46 +406,42 @@
     margin-bottom: 1rem;
   }
 
-  .card-emoji {
-    font-size: 2.8rem;
-    line-height: 1;
-  }
+  .pizza-icon { font-size: 3.5rem; }
 
   .card-tag {
     display: inline-block;
-    background: rgba(196,112,75,0.08);
-    color: var(--terracotta);
     font-size: 0.6rem;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 0.3rem 0.7rem;
-    border-radius: 6px;
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
     font-weight: 600;
+    background: rgba(224,69,32,0.08);
+    color: var(--fire);
   }
 
   .card-tag.seasonal {
-    background: rgba(200,152,46,0.08);
+    background: rgba(201,149,44,0.1);
     color: var(--gold);
   }
 
   .card-tag.chefs {
-    background: rgba(107,122,94,0.08);
-    color: var(--olive);
+    background: rgba(44,30,21,0.05);
+    color: var(--brown-dim);
   }
 
   .pizza-card h3 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     letter-spacing: 2px;
     color: var(--brown);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 
-  .pizza-card .card-desc {
-    font-size: 0.82rem;
+  .pizza-card .desc {
     color: var(--brown-faint);
-    line-height: 1.7;
-    font-weight: 300;
+    font-size: 0.9rem;
+    line-height: 1.6;
     margin-bottom: 1.5rem;
   }
 
@@ -590,21 +449,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
   }
 
-  .card-price {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    color: var(--terracotta);
+  .pizza-card .price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--fire);
   }
 
-  .card-price span {
-    font-family: 'Karla', sans-serif;
-    font-size: 0.75rem;
+  .pizza-card .price span {
+    font-size: 1rem;
     color: var(--brown-faint);
-    font-weight: 300;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .card-add {
@@ -623,77 +479,190 @@
   }
 
   .card-add:hover {
-    background: var(--terracotta);
-    border-color: var(--terracotta);
+    background: var(--fire);
+    border-color: var(--fire);
     color: var(--surface);
     transform: rotate(90deg);
   }
 
-  /* ─── TESTIMONIALS ─── */
-  .testimonials {
-    padding: 7rem 3.5rem;
-    background: var(--surface-warm);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
+  /* ─── STORY (V1 layout + V2 floating tags) ─── */
+  .story {
+    padding: 8rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
   }
 
-  .test-header {
-    text-align: center;
-    margin-bottom: 4rem;
+  .story-visual {
+    width: 380px;
+    height: 480px;
+    background: linear-gradient(135deg, var(--warm) 0%, var(--sand) 100%);
+    border: 1px solid var(--sand);
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+
+  .story-visual .big-emoji {
+    font-size: 10rem;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+  }
+
+  .story-visual::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, var(--fire), transparent, var(--gold));
+    z-index: -1;
+    opacity: 0.2;
+    border-radius: 4px;
+  }
+
+  .story-tag {
+    position: absolute;
+    z-index: 5;
+    background: var(--surface);
+    border: 1px solid var(--sand);
+    padding: 0.5rem 0.9rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--brown);
+    box-shadow: 0 6px 20px rgba(44,30,21,0.06);
+    animation: floatTag 4.5s ease-in-out infinite;
+    white-space: nowrap;
+  }
+
+  .story-tag:nth-child(2) { top: 10%; right: -20px; animation-delay: 0s; }
+  .story-tag:nth-child(3) { bottom: 15%; left: -24px; animation-delay: 1s; }
+  .story-tag:nth-child(4) { top: 50%; left: -30px; animation-delay: 0.5s; }
+
+  @keyframes floatTag {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .story-text { max-width: 450px; }
+
+  .story-text h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: var(--brown);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+
+  .story-text h2 em {
+    font-style: normal;
+    color: var(--fire);
+  }
+
+  .story-tagline {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--terracotta);
+    margin-bottom: 1.5rem;
+  }
+
+  .story-text p {
+    color: var(--brown-faint);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+
+  .stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 2.5rem;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--fire);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--brown-faint);
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  .testimonials {
+    padding: 8rem 3rem;
+    background: var(--warm);
+    text-align: center;
+    border-top: 1px solid var(--brown-ghost);
+    border-bottom: 1px solid var(--brown-ghost);
   }
 
   .test-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    gap: 2rem;
     max-width: 1100px;
-    margin: 0 auto;
-    position: relative;
+    margin: 3rem auto 0;
   }
 
   .test-card {
     background: var(--surface);
     border: 1px solid var(--sand);
     padding: 2.5rem 2rem;
-    border-radius: 16px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    text-align: left;
+    border-radius: 4px;
+    transition: all 0.4s;
   }
 
   .test-card:hover {
     transform: translateY(-4px);
-    border-color: var(--border-hover);
-    box-shadow: 0 16px 48px rgba(62,44,35,0.06);
+    border-color: rgba(224,69,32,0.15);
+    box-shadow: 0 16px 48px rgba(44,30,21,0.05);
   }
 
   .test-stars {
     color: var(--gold);
-    font-size: 0.8rem;
-    letter-spacing: 3px;
-    margin-bottom: 1.2rem;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
   }
 
   .test-quote {
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
     font-style: italic;
-    line-height: 1.75;
+    font-size: 1.05rem;
+    line-height: 1.7;
     color: var(--brown-dim);
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.5rem;
   }
 
-  .test-divider {
+  .test-line {
     width: 30px;
     height: 2px;
-    background: linear-gradient(90deg, var(--terracotta), var(--gold));
-    margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--fire), var(--gold));
+    margin-bottom: 0.8rem;
   }
 
   .test-author {
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--brown-faint);
     font-weight: 600;
@@ -701,138 +670,110 @@
 
   /* ─── CTA ─── */
   .cta {
-    padding: 10rem 3.5rem;
+    padding: 10rem 3rem;
     text-align: center;
     position: relative;
     overflow: hidden;
   }
 
-  .cta-glow {
+  .cta::before {
+    content: '';
     position: absolute;
-    bottom: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 700px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(196,112,75,0.06) 0%, rgba(212,160,74,0.03) 40%, transparent 70%);
-    pointer-events: none;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(224,69,32,0.04) 0%, transparent 60%);
   }
 
   .cta h2 {
     position: relative;
-    z-index: 2;
   }
 
-  .cta .line1 {
+  .cta .lead-in {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
-    color: var(--brown-faint);
-    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--terracotta);
     display: block;
     margin-bottom: 0.5rem;
   }
 
-  .cta .line2 {
+  .cta h2 .line1 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(3.5rem, 9vw, 8rem);
-    letter-spacing: 4px;
+    font-size: clamp(3rem, 8vw, 7rem);
     line-height: 0.9;
     color: var(--brown);
     display: block;
   }
 
-  .cta .line2 em {
-    font-style: normal;
-    color: var(--terracotta);
+  .cta h2 .line2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.9;
+    color: var(--fire);
+    display: block;
   }
 
   .cta p {
-    position: relative;
-    z-index: 2;
     color: var(--brown-faint);
     margin: 2rem auto;
-    max-width: 380px;
-    font-weight: 300;
-    font-size: 0.95rem;
-    line-height: 1.7;
+    max-width: 400px;
+    position: relative;
   }
 
-  .cta .btn-hero-primary {
+  .cta .btn-hero {
     position: relative;
-    z-index: 2;
-    font-size: 0.85rem;
-    padding: 1rem 2.8rem;
+    font-size: 1.4rem;
+    padding: 1.1rem 3.5rem;
   }
 
   /* ─── FOOTER ─── */
   footer {
     background: var(--brown);
     color: var(--sand);
-    padding: 3rem 3.5rem;
+    padding: 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
-  footer .logo-ember,
-  footer .logo-stone { color: var(--sand); }
-  footer .logo-amp { color: var(--terracotta); }
+  footer .logo { color: var(--sand); }
+  footer .logo span { color: var(--fire); }
+
+  footer p {
+    font-size: 0.8rem;
+    opacity: 0.4;
+  }
 
   footer .socials {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
   footer .socials a {
     color: var(--sand);
     opacity: 0.5;
     text-decoration: none;
-    font-size: 0.72rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    font-weight: 500;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
     transition: opacity 0.3s;
   }
 
   footer .socials a:hover { opacity: 1; }
 
-  footer .copyright {
-    font-size: 0.72rem;
-    opacity: 0.4;
-  }
-
   /* ─── RESPONSIVE ─── */
-  @media (max-width: 900px) {
+  @media (max-width: 768px) {
     nav { padding: 1rem 1.5rem; }
     nav ul { display: none; }
-    .hero {
-      grid-template-columns: 1fr;
-      padding: 7rem 1.5rem 3rem;
-      min-height: auto;
-    }
-    .hero-right { display: none; }
-    .hero h1 { font-size: clamp(3rem, 10vw, 4.5rem); }
-    .features {
-      flex-wrap: wrap;
-      gap: 2.5rem;
-      padding: 2.5rem 1.5rem;
-    }
+    .features { flex-wrap: wrap; gap: 2rem; padding: 2.5rem 1.5rem; }
     .menu { padding: 5rem 1.5rem; }
-    .menu-grid { grid-template-columns: 1fr; }
+    .story { padding: 5rem 1.5rem; gap: 3rem; }
+    .story-visual { width: 280px; height: 350px; }
+    .stats { gap: 2rem; }
     .testimonials { padding: 5rem 1.5rem; }
     .test-grid { grid-template-columns: 1fr; }
     .cta { padding: 6rem 1.5rem; }
     footer { padding: 2rem 1.5rem; }
-  }
-
-  @media (min-width: 901px) and (max-width: 1100px) {
-    .hero-frame { width: 340px; height: 430px; }
-    .hero-emoji { font-size: 8rem; }
-    .features { gap: 3rem; }
-    .menu-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -841,215 +782,226 @@
 <nav>
   <div class="nav-left">
     <a href="index.html" class="back-btn">← Back</a>
-    <div class="logo">
-      <span class="logo-ember">EMBER</span>
-      <span class="logo-amp">&</span>
-      <span class="logo-stone">STONE</span>
-    </div>
+    <div class="logo">EMBER<span>&</span>STONE</div>
   </div>
   <ul>
     <li><a href="#menu" class="nav-link">Menu</a></li>
     <li><a href="#story" class="nav-link">Our Story</a></li>
     <li><a href="#reviews" class="nav-link">Reviews</a></li>
   </ul>
-  <button class="btn-order"><span>Order Now</span></button>
+  <button class="btn-order">ORDER NOW</button>
 </nav>
 
+<!-- HERO (V1 centered) -->
 <section class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-glow-2"></div>
-
-  <div class="hero-left">
-    <div class="hero-badge">
-      <span class="badge-dot"></span>
-      Wood-Fired &middot; Artisan &middot; Est. 2023
-    </div>
-    <h1>CRAFTED BY<br><span class="accent">FIRE</span><br>& TRADITION</h1>
-    <p class="hero-sub">Where flame meets finesse</p>
-    <p>Slow-fermented dough kissed by 900-degree flames. Local ingredients, generations of craft, and the kind of char that only a stone hearth can deliver.</p>
-    <div class="hero-buttons">
-      <button class="btn-hero-primary"><span>Explore the Menu</span></button>
-      <button class="btn-hero-outline">Our Story</button>
-    </div>
+  <div class="hero-bg"></div>
+  <div class="fire-glow"></div>
+  <div class="pizza-ring">
+    <span>🍕</span><span>🔥</span><span>🍕</span><span>🔥</span>
+    <span>🍕</span><span>🔥</span><span>🍕</span><span>🔥</span>
   </div>
-
-  <div class="hero-right">
-    <div class="hero-frame">
-      <div class="hero-emoji">🍕</div>
-      <div class="floating-tag tag-1">
-        <span class="tag-icon">🔥</span>
-        <span class="tag-label">900°F Stone Oven</span>
-      </div>
-      <div class="floating-tag tag-2">
-        <span class="tag-icon">🌾</span>
-        <span class="tag-label">72hr Ferment</span>
-      </div>
-      <div class="floating-tag tag-3">
-        <span class="tag-icon">🧑‍🌾</span>
-        <span class="tag-label">Farm Sourced</span>
-      </div>
+  <div class="hero-content">
+    <p class="hero-tag">Wood-Fired &bull; Handcrafted &bull; Legendary</p>
+    <h1>FORGED<br>IN <span class="accent">FIRE</span></h1>
+    <p class="hero-subtitle">Where flame meets finesse</p>
+    <p>Every pizza is born in our 900°F stone hearth. Slow-fermented dough, local ingredients, and generations of craft — forged into blistered perfection.</p>
+    <div class="hero-buttons">
+      <button class="btn-hero">IGNITE YOUR ORDER</button>
+      <button class="btn-hero-outline">Our Story</button>
     </div>
   </div>
 </section>
 
+<div class="divider"></div>
+
+<!-- FEATURES -->
 <div class="features">
   <div class="feature">
     <span class="feature-icon">🌾</span>
     <h4>72-Hour Dough</h4>
-    <p>Cold-fermented for depth &amp; texture</p>
+    <p>Cold-fermented for depth</p>
   </div>
   <div class="feature">
     <span class="feature-icon">🧑‍🌾</span>
-    <h4>Local Ingredients</h4>
-    <p>Sourced from farms we know by name</p>
+    <h4>Farm Sourced</h4>
+    <p>Ingredients we know by name</p>
   </div>
   <div class="feature">
-    <span class="feature-icon">🪨</span>
-    <h4>Stone Hearth</h4>
-    <p>Hand-built oven, white oak fired</p>
+    <span class="feature-icon">🔥</span>
+    <h4>900°F Hearth</h4>
+    <p>Hand-built stone oven</p>
   </div>
   <div class="feature">
     <span class="feature-icon">✨</span>
-    <h4>The Experience</h4>
+    <h4>The Ritual</h4>
     <p>Every pie crafted with intention</p>
   </div>
 </div>
 
-<section class="menu" id="menu">
-  <p class="section-eyebrow">The Menu</p>
-  <h2 class="section-title">FROM THE HEARTH</h2>
-  <p class="section-subtitle">Simple ingredients, extraordinary fire</p>
+<div class="divider"></div>
 
+<!-- MENU -->
+<section class="menu" id="menu">
+  <p class="section-label">The Menu</p>
+  <h2 class="section-title">Our Signatures</h2>
+  <p class="section-subtitle">Simple ingredients, extraordinary fire</p>
   <div class="menu-grid">
     <div class="pizza-card">
       <div class="card-top">
-        <span class="card-emoji">🔥</span>
+        <div class="pizza-icon">🔥</div>
         <span class="card-tag">Bestseller</span>
       </div>
-      <h3>THE EMBER</h3>
-      <p class="card-desc">San Marzano tomatoes, fiordilatte, Calabrian chili, 'nduja, hot honey drizzle, fresh basil</p>
+      <h3>THE INFERNO</h3>
+      <p class="desc">San Marzano tomatoes, fiordilatte mozzarella, Calabrian chili, 'nduja, hot honey drizzle, fresh basil</p>
       <div class="card-bottom">
-        <div class="card-price">$18 <span>/ 12"</span></div>
+        <div class="price">$18 <span>/ 12"</span></div>
         <button class="card-add">+</button>
       </div>
     </div>
-
     <div class="pizza-card">
       <div class="card-top">
-        <span class="card-emoji">🍄</span>
+        <div class="pizza-icon">🍄</div>
         <span class="card-tag seasonal">Seasonal</span>
       </div>
       <h3>FOREST FLOOR</h3>
-      <p class="card-desc">Truffle cream base, wild mushroom medley, fontina, thyme, garlic confit, shaved parmesan</p>
+      <p class="desc">Truffle cream base, wild mushroom medley, fontina, thyme, garlic confit, arugula, shaved parmesan</p>
       <div class="card-bottom">
-        <div class="card-price">$21 <span>/ 12"</span></div>
+        <div class="price">$21 <span>/ 12"</span></div>
         <button class="card-add">+</button>
       </div>
     </div>
-
     <div class="pizza-card">
       <div class="card-top">
-        <span class="card-emoji">🌿</span>
+        <div class="pizza-icon">🌿</div>
       </div>
       <h3>THE PURIST</h3>
-      <p class="card-desc">Classic Margherita — San Marzano DOP, buffalo mozzarella, extra virgin olive oil, torn basil</p>
+      <p class="desc">Classic Margherita. San Marzano DOP, buffalo mozzarella, extra virgin olive oil, fresh basil. Nothing else needed.</p>
       <div class="card-bottom">
-        <div class="card-price">$16 <span>/ 12"</span></div>
+        <div class="price">$16 <span>/ 12"</span></div>
         <button class="card-add">+</button>
       </div>
     </div>
-
     <div class="pizza-card">
       <div class="card-top">
-        <span class="card-emoji">🍯</span>
+        <div class="pizza-icon">🍯</div>
         <span class="card-tag chefs">Chef's Pick</span>
       </div>
       <h3>SMOKE & HONEY</h3>
-      <p class="card-desc">Smoked mozzarella, spicy sopressata, caramelized onions, hot honey, cracked black pepper</p>
+      <p class="desc">Smoked mozzarella, spicy sopressata, caramelized onions, Mike's hot honey, cracked black pepper</p>
       <div class="card-bottom">
-        <div class="card-price">$19 <span>/ 12"</span></div>
+        <div class="price">$19 <span>/ 12"</span></div>
         <button class="card-add">+</button>
       </div>
     </div>
-
     <div class="pizza-card">
       <div class="card-top">
-        <span class="card-emoji">🥚</span>
-      </div>
-      <h3>CARBONARA</h3>
-      <p class="card-desc">Cream base, guanciale, aged pecorino, cracked pepper, farm egg cracked at the center</p>
-      <div class="card-bottom">
-        <div class="card-price">$20 <span>/ 12"</span></div>
-        <button class="card-add">+</button>
-      </div>
-    </div>
-
-    <div class="pizza-card">
-      <div class="card-top">
-        <span class="card-emoji">🧄</span>
+        <div class="pizza-icon">🧄</div>
         <span class="card-tag seasonal">New</span>
       </div>
       <h3>MIDNIGHT GARLIC</h3>
-      <p class="card-desc">Black garlic cream, roasted garlic cloves, burrata, charred scallions, chili flake, olive oil</p>
+      <p class="desc">Black garlic cream, roasted garlic cloves, burrata, charred scallions, chili flake, olive oil</p>
       <div class="card-bottom">
-        <div class="card-price">$20 <span>/ 12"</span></div>
+        <div class="price">$20 <span>/ 12"</span></div>
+        <button class="card-add">+</button>
+      </div>
+    </div>
+    <div class="pizza-card">
+      <div class="card-top">
+        <div class="pizza-icon">🍖</div>
+      </div>
+      <h3>THE BUTCHER</h3>
+      <p class="desc">Red sauce, Italian sausage, pepperoni, pancetta, capicollo, roasted peppers, aged provolone</p>
+      <div class="card-bottom">
+        <div class="price">$22 <span>/ 12"</span></div>
         <button class="card-add">+</button>
       </div>
     </div>
   </div>
 </section>
 
-<section class="testimonials" id="reviews">
-  <div class="test-header">
-    <p class="section-eyebrow">What People Say</p>
-    <h2 class="section-title">VOICES FROM THE TABLE</h2>
-    <p class="section-subtitle">Words that warm us like our oven</p>
-  </div>
+<div class="divider"></div>
 
+<!-- STORY -->
+<section class="story" id="story">
+  <div class="story-visual">
+    <div class="big-emoji">🍕</div>
+    <div class="story-tag">🔥 900°F Stone</div>
+    <div class="story-tag">🌾 72hr Ferment</div>
+    <div class="story-tag">🪵 White Oak</div>
+  </div>
+  <div class="story-text">
+    <p class="section-label">Our Story</p>
+    <h2>OBSESSED WITH <em>FIRE</em> SINCE DAY ONE</h2>
+    <p class="story-tagline">Three years of flame, one unwavering standard</p>
+    <p>We started Ember & Stone in a backyard with a hand-built brick oven and one dream: make pizza that makes people close their eyes on the first bite.</p>
+    <p>Three years later, we haven't changed a thing — except now more people are closing their eyes.</p>
+    <div class="stats">
+      <div>
+        <div class="stat-num">900°</div>
+        <div class="stat-label">Oven Temp</div>
+      </div>
+      <div>
+        <div class="stat-num">72hr</div>
+        <div class="stat-label">Dough Ferment</div>
+      </div>
+      <div>
+        <div class="stat-num">90s</div>
+        <div class="stat-label">Cook Time</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="reviews">
+  <p class="section-label">What People Say</p>
+  <h2 class="section-title">VOICES FROM THE TABLE</h2>
+  <p class="section-subtitle" style="margin-bottom:0;">Words that warm us like our oven</p>
   <div class="test-grid">
     <div class="test-card">
       <div class="test-stars">★★★★★</div>
-      <div class="test-quote">"The char on that crust, the way the mozzarella pools — this is the closest thing to Naples without leaving the city. Absolutely transcendent."</div>
-      <div class="test-divider"></div>
+      <div class="test-quote">"The char on that crust, the way the mozzarella pools — this is the closest to Naples without the plane ticket. Absolutely transcendent."</div>
+      <div class="test-line"></div>
       <div class="test-author">Sarah M. — Food Blogger</div>
     </div>
     <div class="test-card">
       <div class="test-stars">★★★★★</div>
-      <div class="test-quote">"We've been coming every Friday for six months. My kids now judge every pizza against Ember & Stone. Nothing else comes close."</div>
-      <div class="test-divider"></div>
+      <div class="test-quote">"My kids now refuse frozen pizza. Thanks a lot, Ember & Stone. We're here every Friday."</div>
+      <div class="test-line"></div>
       <div class="test-author">James L. — Friday Regular</div>
     </div>
     <div class="test-card">
       <div class="test-stars">★★★★★</div>
-      <div class="test-quote">"The Smoke & Honey changed my life. That hot honey with the char and the sopressata — I dream about it. No exaggeration."</div>
-      <div class="test-divider"></div>
+      <div class="test-quote">"The Smoke & Honey changed my life. That hot honey with the char — I dream about it. No exaggeration."</div>
+      <div class="test-line"></div>
       <div class="test-author">Maya T. — Yelp Elite</div>
     </div>
   </div>
 </section>
 
+<div class="divider"></div>
+
+<!-- CTA -->
 <section class="cta">
-  <div class="cta-glow"></div>
   <h2>
-    <span class="line1">Your table is ready</span>
-    <span class="line2">TASTE THE <em>FLAME</em></span>
+    <span class="lead-in">Your table is ready</span>
+    <span class="line1">READY TO GET</span>
+    <span class="line2">BURNED?</span>
   </h2>
-  <p>Free delivery on your first order. Use code <strong style="color:var(--terracotta);">FIRSTEMBER</strong> at checkout.</p>
-  <button class="btn-hero-primary"><span>Order Now</span></button>
+  <p>Free delivery on your first order. Use code <strong style="color:var(--fire);">FIRSTEMBER</strong> at checkout.</p>
+  <button class="btn-hero">ORDER NOW</button>
 </section>
 
 <footer>
-  <div class="logo">
-    <span class="logo-ember">EMBER</span>
-    <span class="logo-amp">&</span>
-    <span class="logo-stone">STONE</span>
-  </div>
+  <div class="logo">EMBER<span>&</span>STONE</div>
   <div class="socials">
     <a href="#">Instagram</a>
     <a href="#">TikTok</a>
     <a href="#">Yelp</a>
   </div>
-  <p class="copyright">&copy; 2026 Ember & Stone Pizzeria. Crafted with fire.</p>
+  <p>&copy; 2026 Ember & Stone Pizza Co. Forged with fire.</p>
 </footer>
 
 </body>
