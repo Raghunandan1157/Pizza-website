@@ -21,6 +21,12 @@
     --street-1: #39FF14;
     --street-2: #FF2D78;
     --street-3: #FFE500;
+    --fusion-1: #C4704B;
+    --fusion-2: #D4A04A;
+    --fusion-3: #F5EDE0;
+    --light-1: #C4704B;
+    --light-2: #3E2C23;
+    --light-3: #FDFAF6;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,6 +62,7 @@
   .bg-orb--1 { width: 600px; height: 600px; background: var(--fiery-1); top: -200px; left: -100px; }
   .bg-orb--2 { width: 500px; height: 500px; background: var(--artisan-2); bottom: -150px; left: 50%; }
   .bg-orb--3 { width: 550px; height: 550px; background: var(--street-1); top: 30%; right: -200px; }
+  .bg-orb--4 { width: 480px; height: 480px; background: var(--fusion-2); bottom: 10%; right: 20%; }
 
   .container {
     max-width: 1200px;
@@ -174,6 +181,14 @@
   .card--street::before { background: radial-gradient(ellipse at 50% 0%, rgba(57, 255, 20, 0.06), transparent 70%); }
   .card--street:hover::before { opacity: 1; }
 
+  .card--fusion:hover { border-color: rgba(196, 112, 75, 0.35); box-shadow: 0 20px 60px -10px rgba(196, 112, 75, 0.15), 0 0 0 1px rgba(212, 160, 74, 0.08); }
+  .card--fusion::before { background: radial-gradient(ellipse at 50% 0%, rgba(196, 112, 75, 0.06), transparent 70%); }
+  .card--fusion:hover::before { opacity: 1; }
+
+  .card--light:hover { border-color: rgba(196, 112, 75, 0.3); box-shadow: 0 20px 60px -10px rgba(62, 44, 35, 0.12), 0 0 0 1px rgba(196, 112, 75, 0.06); }
+  .card--light::before { background: radial-gradient(ellipse at 50% 0%, rgba(196, 112, 75, 0.05), transparent 70%); }
+  .card--light:hover::before { opacity: 1; }
+
   /* Color banner at top of card */
   .card__banner {
     height: 160px;
@@ -189,6 +204,12 @@
   }
   .card--street .card__banner {
     background: linear-gradient(135deg, #0A0A0A 0%, #0D0D0D 100%);
+  }
+  .card--fusion .card__banner {
+    background: linear-gradient(135deg, #1E1C19 0%, #2A2723 60%, #1A1410 100%);
+  }
+  .card--light .card__banner {
+    background: linear-gradient(135deg, #FDFAF6 0%, #F7F2EB 50%, #EDE6DA 100%);
   }
 
   /* Decorative shapes inside banners */
@@ -250,6 +271,38 @@
     top: 40px; right: 30%;
   }
 
+  .card--fusion .card__banner-shape:nth-child(1) {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(196, 112, 75, 0.3), transparent 70%);
+    top: -60px; right: -30px;
+  }
+  .card--fusion .card__banner-shape:nth-child(2) {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(212, 160, 74, 0.25), transparent 70%);
+    bottom: -30px; left: 10px;
+  }
+  .card--fusion .card__banner-shape:nth-child(3) {
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(245, 237, 224, 0.1), transparent 70%);
+    top: 30px; left: 40%;
+  }
+
+  .card--light .card__banner-shape:nth-child(1) {
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(196, 112, 75, 0.12), transparent 70%);
+    top: -50px; right: -20px;
+  }
+  .card--light .card__banner-shape:nth-child(2) {
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(107, 122, 94, 0.1), transparent 70%);
+    bottom: -30px; left: 0;
+  }
+  .card--light .card__banner-shape:nth-child(3) {
+    width: 90px; height: 90px;
+    background: radial-gradient(circle, rgba(200, 152, 46, 0.1), transparent 70%);
+    top: 30px; left: 45%;
+  }
+
   /* Pizza emoji in banner */
   .card__banner-icon {
     position: absolute;
@@ -284,6 +337,8 @@
   .card--fiery .card__number { color: rgba(255, 69, 0, 0.5); }
   .card--artisan .card__number { color: rgba(92, 107, 79, 0.4); }
   .card--street .card__number { color: rgba(57, 255, 20, 0.4); }
+  .card--fusion .card__number { color: rgba(196, 112, 75, 0.5); }
+  .card--light .card__number { color: rgba(196, 112, 75, 0.35); }
 
   /* Card body */
   .card__body {
@@ -371,6 +426,8 @@
   .card--fiery .card__cta-text { color: var(--fiery-1); }
   .card--artisan .card__cta-text { color: var(--artisan-2); }
   .card--street .card__cta-text { color: var(--street-1); }
+  .card--fusion .card__cta-text { color: var(--fusion-1); }
+  .card--light .card__cta-text { color: var(--light-1); }
 
   .card__cta-arrow {
     width: 32px;
@@ -385,11 +442,15 @@
   .card--fiery .card__cta-arrow { background: rgba(255, 69, 0, 0.1); color: var(--fiery-1); }
   .card--artisan .card__cta-arrow { background: rgba(196, 112, 75, 0.1); color: var(--artisan-2); }
   .card--street .card__cta-arrow { background: rgba(57, 255, 20, 0.1); color: var(--street-1); }
+  .card--fusion .card__cta-arrow { background: rgba(196, 112, 75, 0.1); color: var(--fusion-1); }
+  .card--light .card__cta-arrow { background: rgba(196, 112, 75, 0.1); color: var(--light-1); }
 
   .card:hover .card__cta-arrow { transform: translateX(4px); }
   .card--fiery:hover .card__cta-arrow { background: rgba(255, 69, 0, 0.2); }
   .card--artisan:hover .card__cta-arrow { background: rgba(196, 112, 75, 0.2); }
   .card--street:hover .card__cta-arrow { background: rgba(57, 255, 20, 0.2); }
+  .card--fusion:hover .card__cta-arrow { background: rgba(196, 112, 75, 0.2); }
+  .card--light:hover .card__cta-arrow { background: rgba(196, 112, 75, 0.2); }
 
   /* Stagger card entrance */
   .card {
@@ -400,6 +461,8 @@
   .card:nth-child(1) { animation-delay: 0.15s; }
   .card:nth-child(2) { animation-delay: 0.3s; }
   .card:nth-child(3) { animation-delay: 0.45s; }
+  .card:nth-child(4) { animation-delay: 0.6s; }
+  .card:nth-child(5) { animation-delay: 0.75s; }
 
   @keyframes cardIn {
     to { opacity: 1; transform: translateY(0); }
@@ -436,8 +499,8 @@
     header { padding: 40px 0 10px; }
   }
 
-  @media (min-width: 901px) and (max-width: 1100px) {
-    .grid { gap: 16px; }
+  @media (min-width: 901px) and (max-width: 1200px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
     .card__title { font-size: 22px; }
   }
 </style>
@@ -447,13 +510,14 @@
 <div class="bg-orb bg-orb--1"></div>
 <div class="bg-orb bg-orb--2"></div>
 <div class="bg-orb bg-orb--3"></div>
+<div class="bg-orb bg-orb--4"></div>
 
 <div class="container">
 
   <header>
-    <div class="eyebrow">Three Visions</div>
+    <div class="eyebrow">Five Visions</div>
     <h1>Pizza Website<br><em>Showcase</em></h1>
-    <p class="subtitle">Three distinct design directions — from blazing intensity to rustic charm to neon-lit streets.</p>
+    <p class="subtitle">Five distinct design directions — from blazing intensity to rustic charm, neon streets, dark fusion, and light elegance.</p>
   </header>
 
   <div class="divider"></div>
@@ -533,6 +597,60 @@
           <div class="card__swatch" style="background:#FFE500"></div>
           <div class="card__swatch" style="background:#0A0A0A"></div>
           <div class="card__swatch" style="background:#FAFAFA"></div>
+        </div>
+        <div class="card__cta">
+          <span class="card__cta-text">Explore</span>
+          <span class="card__cta-arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 4: Ember & Stone Dark (Fusion of 1 & 2) -->
+    <a href="pizza-v4-fusion.html" class="card card--fusion">
+      <div class="card__banner">
+        <div class="card__banner-shape"></div>
+        <div class="card__banner-shape"></div>
+        <div class="card__banner-shape"></div>
+        <span class="card__banner-icon">🪨</span>
+        <span class="card__number">04</span>
+      </div>
+      <div class="card__body">
+        <span class="card__label">Website 4 — Dark Fusion</span>
+        <h2 class="card__title">Ember & Stone</h2>
+        <p class="card__tagline">The best of both worlds. Dark dramatic fire meets elegant artisan warmth in one refined experience.</p>
+        <div class="card__palette">
+          <div class="card__swatch" style="background:#C4704B"></div>
+          <div class="card__swatch" style="background:#D4A04A"></div>
+          <div class="card__swatch" style="background:#F5EDE0"></div>
+          <div class="card__swatch" style="background:#1E1C19"></div>
+          <div class="card__swatch" style="background:#2A2723"></div>
+        </div>
+        <div class="card__cta">
+          <span class="card__cta-text">Explore</span>
+          <span class="card__cta-arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 5: Ember & Stone Light -->
+    <a href="pizza-v5-light.html" class="card card--light">
+      <div class="card__banner">
+        <div class="card__banner-shape"></div>
+        <div class="card__banner-shape"></div>
+        <div class="card__banner-shape"></div>
+        <span class="card__banner-icon">☀️</span>
+        <span class="card__number">05</span>
+      </div>
+      <div class="card__body">
+        <span class="card__label">Website 5 — Light Fusion</span>
+        <h2 class="card__title">Ember & Stone — Light</h2>
+        <p class="card__tagline">Same artisan fusion on a warm white canvas. Clean, bright, and inviting with terracotta warmth.</p>
+        <div class="card__palette">
+          <div class="card__swatch" style="background:#C4704B"></div>
+          <div class="card__swatch" style="background:#C8982E"></div>
+          <div class="card__swatch" style="background:#FDFAF6"></div>
+          <div class="card__swatch" style="background:#3E2C23"></div>
+          <div class="card__swatch" style="background:#EDE6DA"></div>
         </div>
         <div class="card__cta">
           <span class="card__cta-text">Explore</span>
