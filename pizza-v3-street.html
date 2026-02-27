@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLICE — Street Pizza</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-green: #39FF14;
+    --neon-pink: #FF2D78;
+    --electric-yellow: #FFE500;
+    --dark: #0A0A0A;
+    --darker: #050505;
+    --card: #111111;
+    --gray: #888;
+    --white: #FAFAFA;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--neon-green);
+    color: var(--dark);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 3rem;
+    z-index: 100;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    text-shadow: 0 0 20px rgba(57,255,20,0.5);
+  }
+
+  .logo .dot { color: var(--neon-pink); }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+  }
+
+  nav a {
+    color: var(--gray);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+
+  nav a:hover {
+    color: var(--neon-green);
+    text-shadow: 0 0 15px rgba(57,255,20,0.5);
+  }
+
+  .btn-neon {
+    background: transparent;
+    color: var(--neon-green);
+    border: 1.5px solid var(--neon-green);
+    padding: 0.65rem 1.8rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .btn-neon:hover {
+    background: var(--neon-green);
+    color: var(--dark);
+    box-shadow: 0 0 30px rgba(57,255,20,0.4), inset 0 0 30px rgba(57,255,20,0.1);
+  }
+
+  .btn-neon.pink {
+    color: var(--neon-pink);
+    border-color: var(--neon-pink);
+  }
+
+  .btn-neon.pink:hover {
+    background: var(--neon-pink);
+    color: var(--dark);
+    box-shadow: 0 0 30px rgba(255,45,120,0.4);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6rem 2rem;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(57,255,20,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    right: 20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,45,120,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-pizza-bg {
+    position: absolute;
+    font-size: 20rem;
+    opacity: 0.04;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseBig 6s ease-in-out infinite;
+  }
+
+  @keyframes pulseBig {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    50% { transform: translate(-50%, -50%) scale(1.05) rotate(5deg); }
+  }
+
+  .hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--neon-pink);
+    margin-bottom: 2rem;
+    position: relative;
+    animation: slideUp 0.8s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero h1 {
+    font-size: clamp(4rem, 12vw, 11rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -3px;
+    position: relative;
+    margin-bottom: 2rem;
+    animation: slideUp 0.8s ease-out 0.1s both;
+  }
+
+  .hero h1 .word1 { color: var(--white); }
+  .hero h1 .word2 {
+    color: var(--neon-green);
+    text-shadow: 0 0 60px rgba(57,255,20,0.3);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--gray);
+    font-weight: 300;
+    max-width: 450px;
+    margin-bottom: 3rem;
+    line-height: 1.7;
+    position: relative;
+    animation: slideUp 0.8s ease-out 0.2s both;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+    animation: slideUp 0.8s ease-out 0.3s both;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* MARQUEE */
+  .marquee-wrapper {
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 1.2rem 0;
+    background: var(--darker);
+  }
+
+  .marquee {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll 20s linear infinite;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.15);
+  }
+
+  .marquee span { margin-right: 4rem; }
+  .marquee .highlight { color: var(--neon-green); opacity: 0.4; }
+
+  @keyframes scroll {
+    to { transform: translateX(-50%); }
+  }
+
+  /* MENU GRID */
+  .menu {
+    padding: 8rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .section-header h2 span { color: var(--neon-green); }
+
+  .section-header .sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gray);
+    letter-spacing: 1px;
+  }
+
+  .pizza-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .p-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2rem;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .p-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 0;
+    background: var(--neon-green);
+    transition: height 0.3s;
+  }
+
+  .p-card:hover::before { height: 100%; }
+
+  .p-card:hover {
+    border-color: rgba(57,255,20,0.2);
+    box-shadow: 0 0 40px rgba(57,255,20,0.05);
+    transform: translateY(-2px);
+  }
+
+  .p-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .p-card-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 1px;
+  }
+
+  .p-card-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--neon-green);
+    font-weight: 700;
+  }
+
+  .p-card h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.5px;
+  }
+
+  .p-card .p-desc {
+    color: var(--gray);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .p-card .p-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .p-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--gray);
+  }
+
+  .p-tag.hot {
+    border-color: rgba(255,45,120,0.4);
+    color: var(--neon-pink);
+  }
+
+  .p-tag.new {
+    border-color: rgba(57,255,20,0.3);
+    color: var(--neon-green);
+  }
+
+  .p-tag.veg {
+    border-color: rgba(255,229,0,0.3);
+    color: var(--electric-yellow);
+  }
+
+  /* HOW IT WORKS */
+  .how {
+    padding: 6rem 3rem 8rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .how h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 4rem;
+    letter-spacing: -1px;
+  }
+
+  .how h2 span { color: var(--neon-pink); }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .step {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: var(--card);
+    transition: all 0.3s;
+  }
+
+  .step:hover {
+    border-color: rgba(255,45,120,0.3);
+    box-shadow: 0 0 40px rgba(255,45,120,0.05);
+  }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.06);
+    margin-bottom: 1.5rem;
+  }
+
+  .step-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .step h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+
+  .step p {
+    color: var(--gray);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* CTA */
+  .cta {
+    padding: 8rem 3rem 10rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .cta::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 400px;
+    background: linear-gradient(180deg, transparent, rgba(57,255,20,0.03));
+    pointer-events: none;
+  }
+
+  .cta h2 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .cta h2 .g { color: var(--neon-green); text-shadow: 0 0 40px rgba(57,255,20,0.3); }
+  .cta h2 .p { color: var(--neon-pink); text-shadow: 0 0 40px rgba(255,45,120,0.3); }
+
+  .cta p {
+    color: var(--gray);
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    position: relative;
+  }
+
+  .cta .btn-neon {
+    font-size: 0.85rem;
+    padding: 0.9rem 2.5rem;
+    position: relative;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 2.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+  }
+
+  footer .socials {
+    display: flex;
+    gap: 2rem;
+  }
+
+  footer .socials a {
+    font-family: 'Space Mono', monospace;
+    color: rgba(255,255,255,0.2);
+    text-decoration: none;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+
+  footer .socials a:hover {
+    color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(57,255,20,0.4);
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    nav ul { display: none; }
+    .menu { padding: 5rem 1.5rem; }
+    .pizza-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .how { padding: 4rem 1.5rem; }
+    footer { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">SLICE<span class="dot">.</span></div>
+  <ul>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#">Locations</a></li>
+  </ul>
+  <button class="btn-neon">ORDER →</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-pizza-bg">🍕</div>
+  <div class="hero-label">// Street pizza, elevated //</div>
+  <h1>
+    <span class="word1">GET A</span>
+    <span class="word2">SLICE.</span>
+  </h1>
+  <p class="hero-sub">Not your average pizza joint. We do handmade pies with ridiculous toppings, baked fast and served hot. No rules, just flavor.</p>
+  <div class="hero-buttons">
+    <button class="btn-neon">ORDER NOW →</button>
+    <button class="btn-neon pink">SEE MENU</button>
+  </div>
+  <div class="scroll-hint">↓ Scroll for the goods ↓</div>
+</section>
+
+<div class="marquee-wrapper">
+  <div class="marquee">
+    <span>Fresh dough daily</span>
+    <span class="highlight">★</span>
+    <span>Baked in 90 seconds</span>
+    <span class="highlight">★</span>
+    <span>Free delivery after 6PM</span>
+    <span class="highlight">★</span>
+    <span>Vegan options available</span>
+    <span class="highlight">★</span>
+    <span>Open till 2AM</span>
+    <span class="highlight">★</span>
+    <span>Fresh dough daily</span>
+    <span class="highlight">★</span>
+    <span>Baked in 90 seconds</span>
+    <span class="highlight">★</span>
+    <span>Free delivery after 6PM</span>
+    <span class="highlight">★</span>
+    <span>Vegan options available</span>
+    <span class="highlight">★</span>
+    <span>Open till 2AM</span>
+    <span class="highlight">★</span>
+  </div>
+</div>
+
+<section class="menu" id="menu">
+  <div class="section-header">
+    <h2>The <span>Menu</span></h2>
+    <div class="sub">6 signatures / seasonal specials</div>
+  </div>
+  <div class="pizza-grid">
+    <div class="p-card">
+      <div class="p-card-top">
+        <span class="p-card-num">01</span>
+        <span class="p-card-price">$14</span>
+      </div>
+      <h3>The OG Marg</h3>
+      <p class="p-desc">Tomato, fresh mozz, basil, EVOO. The one that started it all. No frills, all flavor.</p>
+      <div class="p-tags">
+        <span class="p-tag veg">Vegetarian</span>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-card-top">
+        <span class="p-card-num">02</span>
+        <span class="p-card-price">$17</span>
+      </div>
+      <h3>Pepperoni Drip</h3>
+      <p class="p-desc">Cup & char pepperoni, mozzarella, tomato sauce, chili oil drizzle, fresh oregano.</p>
+      <div class="p-tags">
+        <span class="p-tag hot">🔥 Spicy</span>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-card-top">
+        <span class="p-card-num">03</span>
+        <span class="p-card-price">$19</span>
+      </div>
+      <h3>Truffle Shuffle</h3>
+      <p class="p-desc">Black truffle cream, wild mushrooms, fontina, arugula, parmesan rain.</p>
+      <div class="p-tags">
+        <span class="p-tag new">New</span>
+        <span class="p-tag veg">Vegetarian</span>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-card-top">
+        <span class="p-card-num">04</span>
+        <span class="p-card-price">$18</span>
+      </div>
+      <h3>Hot Honey Situation</h3>
+      <p class="p-desc">Sopressata, mozzarella, pickled jalapeños, Mike's hot honey, crushed red pepper.</p>
+      <div class="p-tags">
+        <span class="p-tag hot">🔥 Spicy</span>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-card-top">
+        <span class="p-card-num">05</span>
+        <span class="p-card-price">$18</span>
+      </div>
+      <h3>Green Machine</h3>
+      <p class="p-desc">Pesto base, artichoke, roasted zucchini, goat cheese, lemon, pine nuts. All plants, all fire.</p>
+      <div class="p-tags">
+        <span class="p-tag veg">Vegan opt.</span>
+        <span class="p-tag new">New</span>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-card-top">
+        <span class="p-card-num">06</span>
+        <span class="p-card-price">$20</span>
+      </div>
+      <h3>The Butcher's Cut</h3>
+      <p class="p-desc">Italian sausage, nduja, pancetta, roasted garlic, smoked mozz, fresh basil.</p>
+      <div class="p-tags">
+        <span class="p-tag hot">🔥 Spicy</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <h2>How It <span>Works</span></h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-emoji">📱</div>
+      <h4>Pick Your Pie</h4>
+      <p>Browse the menu. Choose your weapon. Customize if you're feeling brave.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-emoji">🔥</div>
+      <h4>We Fire It Up</h4>
+      <p>Handmade to order, fired in our 900° oven in 90 seconds flat.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-emoji">🛵</div>
+      <h4>Hot to Your Door</h4>
+      <p>Pickup in 10 mins or delivery in 30. Still sizzling when it arrives.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>STOP <span class="g">SCROLLING</span>.<br>START <span class="p">EATING</span>.</h2>
+  <p>Use code FIRSTSLICE for 20% off your first order.</p>
+  <button class="btn-neon">ORDER NOW →</button>
+</section>
+
+<footer>
+  <div class="logo">SLICE<span class="dot">.</span></div>
+  <div class="socials">
+    <a href="#">Instagram</a>
+    <a href="#">TikTok</a>
+    <a href="#">Twitter</a>
+  </div>
+  <p>&copy; 2026 SLICE PIZZA CO. ALL RIGHTS RESERVED.</p>
+</footer>
+
+</body>
+</html>
